@@ -330,6 +330,95 @@ server {
 
 ---
 
+## 📝 部署经验与注意事项（实战总结）
+
+### 1. xCrab 启动报错：Cannot find module sqlite-store.js
+
+**问题**：仓库缺少 `xCrab/src/memory/sqlite-store.js` 文件，导致 xCrab 无法启动。
+
+**解决**：手动创建该文件（完整代码见下方）。
+
+### 2. MiniMax API 地址配置
+
+**问题**：使用 `https://api.minimaxi.com/anthropic` 地址会返回 404 错误。
+
+**解决**：MiniMax 使用 OpenAI 兼容格式，应配置为：
+
+```bash
+MINIMAX_BASE_URL=https://api.minimaxi.com/v1
+```
+
+### 3. eclaw 端口与 cclaw 不匹配
+
+**问题**：eclaw 默认监听 10001 端口，但 cclaw 默认连接 10090 端口。
+
+**解决**：修改 `eclaw/server.js` 中的端口：
+
+```javascript
+// 找到这行并修改
+const PORT = 10090;  // 原为 10001
+```
+
+### 4. PM2 启动 xCrab 时 dotenv 不加载
+
+**问题**：使用 `pm2 start ecosystem.config.cjs` 时，.env 文件可能不被正确加载。
+
+**解决**：使用 npm start 方式启动：
+
+```bash
+cd xCrab
+pm2 start npm --name xcrab -- start
+```
+
+或直接启动：
+
+```bash
+cd xCrab
+pm2 start index.js --name xcrab
+```
+
+### 5. MySQL 认证问题
+
+**问题**：Ubuntu 24.04 的 MySQL 8.0 默认使用 caching_sha2_password 认证。
+
+**解决**：使用 debian-sys-maint 账号或修改认证方式：
+
+```bash
+# 查看 debian 维护账号密码
+cat /etc/mysql/debian.cnf
+
+# 或修改 root 认证方式
+sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password';"
+```
+
+### 6. 完整部署检查清单
+
+```bash
+# 1. 检查所有服务状态
+pm2 status
+
+# 2. 检查端口占用
+ss -tlnp | grep -E ":(3000|10090)"
+
+# 3. 测试 xCrab API
+curl -X POST http://localhost:3000/api/chat \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"message":"你好"}'
+
+# 4. 测试 eclaw API
+curl -X POST http://localhost:10090/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test","password":"test"}'
+
+# 5. 查看日志
+pm2 logs xcrab --lines 50
+pm2 logs eclaw --lines 50
+pm2 logs cclaw --lines 50
+```
+
+
+
 ## ❓ 常见问题
 
 ### 1. MySQL 认证失败

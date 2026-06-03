@@ -29,6 +29,7 @@ build/
 # Memory data (keep structure but not content)
 xCrab/src/memory/*.js
 !xCrab/src/memory/store.js
+!xCrab/src/memory/sqlite-store.js
 
 # Database files (runtime generated)
 xCrab/data/*.db
