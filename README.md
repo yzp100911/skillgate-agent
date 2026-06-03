@@ -1,50 +1,48 @@
-# skillgate-agent 🦀
+# skillgate-agent 🦀（已全开源）
 
-基于 MiniMax-M2.7 的智能 AI 助手套件，包含 **xCrab (AI执行引擎)**、**eclaw (服务分发器)**、**cclaw (远程分发器)** 和 **wclaw (Web客户端)** 四大核心组件。
+基于 MiniMax-M2.7（也可以自定义模型）的 AI Agent 框架，包含 **xCrab (AI执行引擎)**、**eclaw (服务分发器)**、**cclaw (远程分发器)** 和 **wclaw (Web客户端)** 四大核心组件。
 
-一套仓库，完整部署。
-
----
-
-## ⚠️ 品牌声明
-
-**skillgate-agent** 是一个独立的国产开源项目，与 [OpenClaw](https://github.com/openclaw/openclaw)（开源 AI 代理框架）不存在任何关联、衍生、授权或赞助关系。
-
-### 项目定位
-
-skillgate-agent 是一个**多模型 AI 网关**，专注于：
-- 模型聚合与路由
-- 统一 API 接入
-- 高速低延迟转发服务
-- 支持 MiniMax、DeepSeek 等国内主流模型
-
-### 命名由来
-
-- **"Crab"** 意为螃蟹 — 象征高效、快速、横向移动
-- 整体命名遵循开源社区常见的动物命名惯例（如 TensorFlow、Camel 等），无意模仿或混淆任何已有品牌
-
-### 商标声明
-
-1. skillgate-agent 的项目名称及相关标识均由项目作者独立创作
-2. 如需在商业产品中使用 skillgate-agent 代码或名称，请自行评估并承担相关法律责任
-3. 项目作者不对因使用本项目产生的任何商标或知识产权纠纷承担责任
-
-### 联系方式
-
-如有品牌相关问题，请通过 GitHub Issues 联系项目维护者。
+一套仓库，即可完整部署！【如果你实在嫌麻烦，你可以让 AI 编程工具（Claude Code，Codex，Windsurf，OpenCode，Trae）帮你部署即可】
 
 ---
+
+## 📦 系统架构
+
+```
+skillgate-agent/
+├── deploy.sh              # 一键部署脚本
+├── README.md              # 中文文档（当前文件）
+├── README_EN.md           # 英文文档
+├── .env.example           # 根环境变量模板
+├── LICENSE                # MIT 许可证
+├── xCrab/                 # AI 执行引擎（核心）
+│   ├── index.js           # 主入口
+│   ├── src/               # 核心源码
+│   ├── skills/            # 技能模块
+│   └── wclaw/             # Web 客户端前端
+├── eclaw/                 # 服务分发器（后端）
+│   ├── server.js          # Express + WebSocket 服务
+│   ├── cloud-sync.js      # 云数据库同步
+│   └── wclaw/             # Web 客户端副本
+└── cclaw/                 # 远程分发器（客户端）
+    ├── index.js           # 主入口
+    └── data/              # 配置和会话数据
+```
 
 ## 功能特性
 
-- 🤖 **AI 对话** - 基于 MiniMax-M2.7 模型
-- 🦀 **技能系统** - 支持动态加载各种技能（如浏览器自动化、翻译等）
-- 💾 **记忆系统** - 支持对话历史存储和检索
+- 🤖 **AI 对话** - 支持 MiniMax-M2.7、DeepSeek 等多模型切换
+- 🦀 **技能系统** - 支持动态加载各种技能（浏览器自动化、翻译等）
+- 💾 **记忆系统** - 支持对话历史存储和检索（SQLite）
 - 🔐 **Gateway 认证** - 支持 Token 认证保护
 - 🌐 **浏览器自动化** - 可选支持 Playwright 浏览器控制
 - 📡 **多模块架构** - 集成 xCrab、eclaw、cclaw、wclaw 四大模块
+- 📱 **短信验证** - 支持短信宝进行手机验证登录
+- ☁️ **云数据库** - 通过 SSH 隧道连接云 MySQL 数据库
 
-## 快速部署
+---
+
+## 🚀 快速部署
 
 ### 方式一：一键部署（推荐）
 
@@ -55,91 +53,154 @@ chmod +x deploy.sh
 ./deploy.sh
 ```
 
-### 方式二：手动部署（Linux 服务器）
+### 方式二：手动部署
+
+#### 1. 环境要求
+
+- Node.js >= 18.0.0（xCrab/eclaw），>= 22.12（cclaw）
+- MySQL 5.7+ 或 MariaDB 10.3+
+- PM2（进程管理器）
+- Nginx（反向代理，可选）
+
+#### 2. 安装依赖
 
 ```bash
-# 1. 克隆仓库
-git clone https://github.com/yzp100911/skillgate-agent.git
-cd skillgate-agent
+# 安装 Node.js 18+
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
-# 2. 进入 xCrab 目录
-cd xCrab
+# 安装 PM2
+npm install -g pm2
 
-# 3. 安装依赖
+# 安装 MySQL
+sudo apt-get install -y mysql-server
+sudo systemctl start mysql
+sudo systemctl enable mysql
+```
+
+#### 3. 配置数据库
+
+```bash
+# 配置 MySQL 认证（解决 caching_sha2_password 问题）
+sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password'; FLUSH PRIVILEGES;"
+
+# 创建数据库
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS wclaw_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
+
+#### 4. 部署 xCrab（AI 执行引擎）
+
+```bash
+cd skillgate-agent/xCrab
+
+# 安装依赖
 npm install
 
-# 4. 配置环境变量
+# 配置环境变量
 cp .env.example .env
-nano .env  # 编辑填入 AUTH_TOKEN 和 MINIMAX_API_KEY
+# 编辑 .env 文件，填入必要的 API Key
 
-# 5. 启动服务
+# 启动服务
+pm2 start ecosystem.config.cjs
+pm2 save
+
+# 验证
+curl http://localhost:60016/health
+```
+
+#### 5. 部署 eclaw（服务分发器）
+
+```bash
+cd skillgate-agent/eclaw
+
+# 安装依赖
+npm install
+
+# 配置环境变量
+# 编辑 .env 文件，配置数据库和 xCrab Token
+
+# 启动服务
+node server.js
+# 或使用 PM2
+pm2 start server.js --name eclaw
+```
+
+#### 6. 部署 cclaw（远程分发器）
+
+```bash
+cd skillgate-agent/cclaw
+
+# 安装依赖
+npm install
+
+# 启动客户端
 chmod +x start.sh
 ./start.sh
-
-# 6. 验证服务
-curl -H "Authorization: Bearer YOUR_AUTH_TOKEN" \
-     http://localhost:60016/api/chat \
-     -d '{"message":"你好"}'
+# 或直接运行
+node index.js
 ```
 
-### 方式三：Windows 部署
+---
+
+## ⚙️ 配置说明
+
+### xCrab 环境变量 (`xCrab/.env`)
 
 ```bash
-git clone https://github.com/yzp100911/skillgate-agent.git
-cd skillgate-agent\xCrab
-npm install
-copy .env.example .env
-npm start
-```
+# 必填 - API Keys
+MINIMAX_API_KEY=your_minimax_api_key_here
+DEEPSEEK_API_KEY=your_deepseek_api_key_here
 
-## 环境要求
+# 可选 - MIMO API（小米模型）
+MIMO_API_KEY=your_mimo_api_key_here
+MIMO_BASE_URL=https://api.xiaomimimo.com/v1
 
-- Node.js 18+
-- PM2（进程管理器，Linux 必需）
-- Git
+# 模型选择
+MODEL=MiniMax-M2.7  # 或 deepseek-v4-flash
 
-## 配置说明
-
-编辑 xCrab/.env 文件：
-
-```bash
-# 必填
-AUTH_TOKEN=your_secure_token_here
-MINIMAX_API_KEY=your_api_key_here
-
-# 可选（已有默认值）
-MINIMAX_BASE_URL=https://api.minimaxi.com/v1
-MINIMAX_MODEL=MiniMax-M2.7
-PORT=60016
-ENABLE_MEMORY=true
+# Gateway 配置
 GATEWAY_ENABLED=true
+GATEWAY_PORT=3000
 GATEWAY_TOKEN=your_gateway_token_here
+
+# 记忆系统
+ENABLE_MEMORY=true
 ```
 
-## API 使用
-
-### 聊天接口
+### eclaw 环境变量 (`eclaw/.env`)
 
 ```bash
-curl -X POST http://localhost:60016/api/chat \
-  -H "Authorization: Bearer YOUR_AUTH_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"message":"你好，请介绍一下你自己"}'
+# 数据库配置
+DB_HOST=localhost
+DB_USER=wclaw_db
+DB_PASS=your_db_password_here
+DB_NAME=wclaw_db
+
+# xCrab Token（用于连接 xCrab 执行引擎）
+XCRAB_TOKEN=your_xcrab_token_here
+
+# 短信宝配置（可选）
+SMSBAO_USER=your_smsbao_user_here
+SMSBAO_PASSWORD=your_smsbao_password_here
 ```
 
-### 响应格式
+### cclaw 环境变量
 
-```json
-{
-  "code": 200,
-  "data": {
-    "content": "你好！我是 xCrab...",
-    "sessionId": "xxx-xxx-xxx"
-  }
-}
+```bash
+# 连接 eclaw 服务端地址（默认本地）
+export ECLAW_API_URL=http://127.0.0.1:10090
+export ECLAW_WS_URL=ws://127.0.0.1:10090/ws
+
+# 连接远程服务器
+export ECLAW_API_URL=http://your-server:10090
+export ECLAW_WS_URL=ws://your-server:10090/ws
 ```
 
-## PM2 管理命令
+---
+
+## 🔧 服务管理
+
+### xCrab
 
 ```bash
 pm2 status xcrab       # 查看状态
@@ -149,36 +210,162 @@ pm2 stop xcrab         # 停止
 pm2 delete xcrab       # 删除进程
 ```
 
-## 📂 目录结构
+### eclaw
 
-```
-skillgate-agent/
-├── deploy.sh                 # 一键部署脚本
-├── README.md                 # 中文文档
-├── README_EN.md              # 英文文档
-├── .env.example              # 根环境变量模板
-├── LICENSE                   # 许可证
-├── xCrab/                    # AI 执行引擎
-│   ├── index.js              # 主入口
-│   ├── src/                  # 核心源码
-│   │   ├── tools.js          # 工具函数
-│   │   └── memory/           # 记忆系统
-│   ├── skills/               # 技能模块
-│   ├── eclaw/                # 服务分发器
-│   ├── cclaw/                # 远程分发器
-│   ├── wclaw/                # Web 客户端
-│   ├── data/                 # 数据存储
-│   ├── start.sh              # 启动脚本
-│   ├── ecosystem.config.cjs  # PM2 配置
-│   └── .env.example          # 环境变量模板
+```bash
+pm2 status eclaw       # 查看状态
+pm2 logs eclaw         # 查看日志
+pm2 restart eclaw      # 重启
 ```
 
-## 📄 许可证
+### cclaw
+
+```bash
+pm2 status cclaw       # 查看状态
+pm2 logs cclaw         # 查看日志
+pm2 restart cclaw      # 重启
+```
+
+---
+
+## 🌐 访问地址
+
+| 服务 | 地址 | 说明 |
+|------|------|------|
+| xCrab Gateway | http://localhost:60016 | AI 执行引擎 API |
+| xCrab 健康检查 | http://localhost:60016/health | 服务状态 |
+| eclaw 服务端 | http://localhost:10001 | 后端 API（Nginx 代理到 10090） |
+| wclaw 网页端 | http://localhost:10001 | Web 客户端界面 |
+| WebSocket | ws://localhost:10001/ws | 实时通信 |
+
+---
+
+## 📡 API 使用
+
+### xCrab Chat API
+
+```bash
+curl -X POST http://localhost:60016/api/chat \
+  -H "Authorization: Bearer YOUR_AUTH_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"message":"你好，请介绍一下自己"}'
+```
+
+### eclaw 登录 API
+
+```bash
+curl -X POST http://localhost:10001/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"your_username","password":"your_password","phone":"your_phone","sms_code":"123456"}'
+```
+
+---
+
+## 🔍 健康检查
+
+```bash
+# xCrab 健康检查
+curl http://localhost:60016/health
+# 返回: {"status":"ok","timestamp":"...","uptime":...}
+
+# eclaw 健康检查
+curl http://localhost:10001/api/health
+```
+
+---
+
+## 📊 进程监控
+
+```bash
+# 查看所有进程状态
+pm2 status
+
+# 查看所有日志
+pm2 logs
+
+# 监控面板
+pm2 monit
+
+# 设置开机自启
+pm2 startup
+pm2 save
+```
+
+---
+
+## 🔐 Nginx 配置（可选）
+
+如果需要通过域名访问，配置 Nginx 反向代理：
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    # eclaw 服务端
+    location / {
+        proxy_pass http://127.0.0.1:10001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+
+    # xCrab Gateway
+    location /xcrab/ {
+        proxy_pass http://127.0.0.1:60016/;
+    }
+}
+```
+
+---
+
+## 📝 详细文档
+
+各模块的详细部署和使用说明请参考对应目录下的 README：
+
+| 模块 | 说明 | 文档 |
+|------|------|------|
+| xCrab | AI 执行引擎（核心） | [xCrab/README.md](xCrab/README.md) |
+| xCrab (EN) | AI Execution Engine | [xCrab/README_EN.md](xCrab/README_EN.md) |
+
+---
+
+## ❓ 常见问题
+
+### 1. MySQL 认证失败
+```
+Error: ER_NOT_SUPPORTED_AUTH_MODE: Client does not support authentication protocol
+```
+**解决**：
+```bash
+sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password'; FLUSH PRIVILEGES;"
+```
+
+### 2. 端口被占用
+```
+Error: listen EADDRINUSE :::60016
+```
+**解决**：
+```bash
+lsof -i :60016   # 查找占用进程
+pm2 restart xcrab
+```
+
+### 3. cclaw 连接失败
+**检查**：
+- 确认 eclaw 服务已启动
+- 检查 `ECLAW_API_URL` 和 `ECLAW_WS_URL` 配置是否正确
+- 检查防火墙是否开放端口
+
+---
+
+## 许可证
 
 本项目采用 [MIT 许可证](LICENSE) 开源。
 
 ---
 
 <p align="center">
-  <strong>skillgate-agent</strong> — 让 AI 助手触手可及
+  <strong>skillgate-agent</strong> — 让 AI 助手触手可及 🦀
 </p>
