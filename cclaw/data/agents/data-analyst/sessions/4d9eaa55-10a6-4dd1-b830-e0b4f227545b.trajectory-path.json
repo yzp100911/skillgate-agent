@@ -1,0 +1,6 @@
+{
+  "traceSchema": "openclaw-trajectory-pointer",
+  "schemaVersion": 1,
+  "sessionId": "4d9eaa55-10a6-4dd1-b830-e0b4f227545b",
+  "runtimeFile": "/opt/cclaw-client/UbuntuClaw/cclaw/data/agents/data-analyst/sessions/4d9eaa55-10a6-4dd1-b830-e0b4f227545b.trajectory.jsonl"
+}

@@ -686,6 +686,9 @@ export async function startCLI(skillManager) {
           });
 
           const totalTools = toolCalls.length;
+
+          // 解析参数并触发 beforeTool 钩子
+          const parsedToolCalls = [];
           for (let i = 0; i < totalTools; i++) {
             const tc = toolCalls[i];
             let args;
@@ -694,26 +697,31 @@ export async function startCLI(skillManager) {
             } catch {
               args = {};
             }
+            const toolCtx = await hooks.emit('beforeTool', { name: tc.function.name, args });
+            parsedToolCalls.push({ tc, toolCtx });
+          }
 
-            const toolCtx = await hooks.emit('beforeTool', {
-              name: tc.function.name,
-              args,
-            });
+          // 显示所有即将并行执行的工具
+          for (let i = 0; i < parsedToolCalls.length; i++) {
+            console.log(`  ⚙️ [${i + 1}/${totalTools}] ${parsedToolCalls[i].toolCtx.name}`);
+          }
 
-            // 实时显示工具执行状态：编号、名称、实时计时器
-            console.log(`  ⚙️ [${i + 1}/${totalTools}] ${toolCtx.name}`);
-            const stopTimer = startElapsedTimer();
+          // 并行执行所有工具
+          const stopTimer = startElapsedTimer();
+          const toolResults = await Promise.all(parsedToolCalls.map(({ tc, toolCtx }) =>
+            executeTool(toolCtx.name, toolCtx.args)
+              .then(result => ({ tc, toolCtx, result }))
+              .catch(err => ({ tc, toolCtx, result: `错误: ${err.message}` }))
+          ));
+          stopTimer();
 
-            const result = await executeTool(toolCtx.name, toolCtx.args);
-
-            stopTimer();
-
+          // 按顺序处理结果（保持 LLM 上下文一致性）
+          for (const { tc, toolCtx, result } of toolResults) {
             const afterCtx = await hooks.emit('afterTool', {
               name: tc.function.name,
-              args,
+              args: toolCtx.args,
               result,
             });
-
             const finalResult = afterCtx.result || result;
             console.log(`     📦 ${finalResult.slice(0, 250)}${finalResult.length > 250 ? '...' : ''}`);
             history.addToolResult(tc.id, finalResult);

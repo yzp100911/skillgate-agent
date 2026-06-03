@@ -1,0 +1,537 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.5.7",
+    "lastTouchedAt": "2026-05-14T01:50:29.938Z"
+  },
+  "browser": {
+    "enabled": true,
+    "headless": true,
+    "noSandbox": true
+  },
+  "env": {
+    "OPENROUTER_API_KEY": "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",
+    "MINIMAX_API_KEY": "sk-cp-w_-_nNk1OzVjSev4wMCrFAvaQdw_CSDiyBX7BqQuLyFaS71CfDHMz3C7mg-nnUvtP9HFvTdoWUgv8cMVSsyAbR3BFslWYmO0DOgN_me2QWMCryvdwwfNUWA",
+    "MINIMAX_PORTAL_API_KEY": "sk-cp-w_-_nNk1OzVjSev4wMCrFAvaQdw_CSDiyBX7BqQuLyFaS71CfDHMz3C7mg-nnUvtP9HFvTdoWUgv8cMVSsyAbR3BFslWYmO0DOgN_me2QWMCryvdwwfNUWA",
+    "MINIMAX_OAUTH_TOKEN": "sk-cp-w_-_nNk1OzVjSev4wMCrFAvaQdw_CSDiyBX7BqQuLyFaS71CfDHMz3C7mg-nnUvtP9HFvTdoWUgv8cMVSsyAbR3BFslWYmO0DOgN_me2QWMCryvdwwfNUWA",
+    "CUSTOM_001_API_KEY": "your_deepseek_api_key_here"
+  },
+  "wizard": {
+    "lastRunAt": "2026-05-02T11:30:14.728Z",
+    "lastRunVersion": "2026.3.26",
+    "lastRunCommand": "configure",
+    "lastRunMode": "local"
+  },
+  "auth": {
+    "profiles": {
+      "minimax:cn": {
+        "provider": "minimax",
+        "mode": "api_key"
+      },
+      "minimax-portal:default": {
+        "provider": "minimax-portal",
+        "mode": "oauth"
+      },
+      "openrouter:default": {
+        "provider": "openrouter",
+        "mode": "api_key"
+      },
+      "deepseek:default": {
+        "provider": "deepseek",
+        "mode": "api_key"
+      },
+      "xiaomi:default": {
+        "provider": "xiaomi",
+        "mode": "api_key"
+      }
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "minimax": {
+        "baseUrl": "https://api.minimaxi.com/anthropic",
+        "apiKey": "sk-cp-w_-_nNk1OzVjSev4wMCrFAvaQdw_CSDiyBX7BqQuLyFaS71CfDHMz3C7mg-nnUvtP9HFvTdoWUgv8cMVSsyAbR3BFslWYmO0DOgN_me2QWMCryvdwwfNUWA",
+        "api": "anthropic-messages",
+        "authHeader": true,
+        "models": [
+          {
+            "id": "MiniMax-M2.7",
+            "name": "MiniMax M2.7",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0.3,
+              "output": 1.2,
+              "cacheRead": 0.06,
+              "cacheWrite": 0.375
+            },
+            "contextWindow": 204800,
+            "maxTokens": 131072
+          }
+        ]
+      },
+      "minimax-portal": {
+        "baseUrl": "https://api.minimaxi.com/anthropic",
+        "apiKey": "sk-cp-w_-_nNk1OzVjSev4wMCrFAvaQdw_CSDiyBX7BqQuLyFaS71CfDHMz3C7mg-nnUvtP9HFvTdoWUgv8cMVSsyAbR3BFslWYmO0DOgN_me2QWMCryvdwwfNUWA",
+        "models": []
+      },
+      "openrouter": {
+        "baseUrl": "https://openrouter.ai/api/v1",
+        "apiKey": "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",
+        "models": []
+      },
+      "deepseek": {
+        "baseUrl": "https://api.deepseek.com",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "deepseek-chat",
+            "name": "DeepSeek Chat",
+            "api": "openai-completions",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0.28,
+              "output": 0.42,
+              "cacheRead": 0.028,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 8192,
+            "compat": {
+              "supportsUsageInStreaming": true
+            }
+          },
+          {
+            "id": "deepseek-reasoner",
+            "name": "DeepSeek Reasoner",
+            "api": "openai-completions",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0.28,
+              "output": 0.42,
+              "cacheRead": 0.028,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 65536,
+            "compat": {
+              "supportsUsageInStreaming": true
+            }
+          }
+        ]
+      },
+      "xiaomi": {
+        "baseUrl": "https://api.xiaomimimo.com/v1",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "mimo-v2-flash",
+            "name": "Xiaomi MiMo V2 Flash",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 262144,
+            "maxTokens": 8192
+          },
+          {
+            "id": "mimo-v2-pro",
+            "name": "Xiaomi MiMo V2 Pro",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1048576,
+            "maxTokens": 32000
+          },
+          {
+            "id": "mimo-v2-omni",
+            "name": "Xiaomi MiMo V2 Omni",
+            "reasoning": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 262144,
+            "maxTokens": 32000
+          }
+        ]
+      },
+      "custom-001": {
+        "baseUrl": "https://api.deepseek.com/anthropic",
+        "apiKey": "your_deepseek_api_key_here",
+        "api": "anthropic-messages",
+        "authHeader": true,
+        "models": [
+          {
+            "id": "deepseek-v4-flash",
+            "name": "DeepSeek v4 Flash",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0.3,
+              "output": 1.2,
+              "cacheRead": 0.06,
+              "cacheWrite": 0.375
+            },
+            "contextWindow": 204800,
+            "maxTokens": 131072
+          }
+        ]
+      },
+      "deepseek-v4-flash": {
+        "baseUrl": "https://api.deepseek.com/anthropic",
+        "apiKey": "your_deepseek_api_key_here",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "deepseek-v4-flash",
+            "name": "deepseek-v4-flash (Custom Provider)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 16000,
+            "maxTokens": 4096
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "minimax/MiniMax-M2.7",
+        "fallbacks": [
+          "custom-001/deepseek-v4-flash"
+        ]
+      },
+      "models": {
+        "minimax-portal/MiniMax-M2.7": {
+          "alias": "minimax-m2.7"
+        },
+        "minimax/MiniMax-M2.7": {
+          "alias": "Minimax"
+        },
+        "minimax-portal/MiniMax-M2.7-highspeed": {
+          "alias": "minimax-m2.7-highspeed"
+        },
+        "openrouter/auto": {
+          "alias": "OpenRouter"
+        },
+        "deepseek/deepseek-chat": {
+          "alias": "DeepSeek"
+        },
+        "xiaomi/mimo-v2-flash": {
+          "alias": "Xiaomi"
+        },
+        "custom-001/deepseek-v4-flash": {
+          "alias": "deepseek-v4-flash"
+        },
+        "deepseek-v4-flash/deepseek-v4-flash": {
+          "alias": "deepseek-v4-flash-old"
+        }
+      },
+      "contextPruning": {
+        "mode": "cache-ttl",
+        "ttl": "1h"
+      },
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "heartbeat": {
+        "every": "30m"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8,
+        "maxSpawnDepth": 2
+      },
+      "sandbox": {
+        "mode": "off"
+      }
+    },
+    "list": [
+      {
+        "id": "coordinator",
+        "default": true,
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/coordinator",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "frontend-dev",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/frontend-dev",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "backend-dev",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/backend-dev",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "fullstack-dev",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/fullstack-dev",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "architect",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/architect",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "devops",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/devops",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "data-engineer",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/data-engineer",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "security-expert",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/security-expert",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "ui-designer",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/ui-designer",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "ux-researcher",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/ux-researcher",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": []
+        }
+      },
+      {
+        "id": "product-manager",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/product-manager",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "data-analyst",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/data-analyst",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": []
+        }
+      },
+      {
+        "id": "ai-ml-engineer",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/ai-ml-engineer",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "marketing-specialist",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/marketing-specialist",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "content-creator",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/content-creator",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": []
+        }
+      },
+      {
+        "id": "project-manager",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/project-manager",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "qa-engineer",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/qa-engineer",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "customer-support",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/customer-support",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": []
+        }
+      },
+      {
+        "id": "researcher",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/researcher",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": []
+        }
+      },
+      {
+        "id": "legal-advisor",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/legal-advisor",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": []
+        }
+      },
+      {
+        "id": "financial-analyst",
+        "workspace": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspaces/financial-analyst",
+        "model": "minimax/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": []
+        }
+      }
+    ]
+  },
+  "tools": {
+    "sessions": {
+      "visibility": "all"
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token"
+    },
+    "remote": {}
+  },
+  "plugins": {
+    "entries": {
+      "minimax": {
+        "enabled": true,
+        "config": {}
+      },
+      "openrouter": {
+        "enabled": true
+      },
+      "deepseek": {
+        "enabled": true
+      },
+      "xiaomi": {
+        "enabled": true
+      },
+      "browser": {
+        "enabled": true
+      },
+      "openclaw-weixin": {
+        "enabled": true
+      }
+    }
+  },
+  "cli": {
+    "banner": {
+      "taglineMode": "off"
+    }
+  }
+}

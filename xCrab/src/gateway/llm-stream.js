@@ -21,10 +21,10 @@ export async function callLLMStream(messages, tools, callbacks) {
   const model = getModel();
 
   // 不同模型的 max_tokens 限制不同
-  const maxTokens = model === 'deepseek-v4-flash' ? 393216 : 196608;
+  const maxTokens = model.startsWith('deepseek-v4-flash') ? 393216 : model.startsWith('mimo-v2.5-pro') ? 131072 : 196608;
 
   const body = {
-    model,
+    model: model.replace('[1M]', ''),
     messages,
     temperature: 0.7,
     max_tokens: maxTokens,
@@ -37,9 +37,9 @@ export async function callLLMStream(messages, tools, callbacks) {
     body.tool_choice = 'auto';
   }
 
-  // 设置请求超时（120秒），防止无限挂起
+  // 设置请求超时（300秒），防止无限挂起
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 120_000);
+  const timeoutId = setTimeout(() => controller.abort(), 300_000);
 
   let response;
   try {
@@ -55,7 +55,7 @@ export async function callLLMStream(messages, tools, callbacks) {
   } catch (err) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
-      callbacks.onError?.(new Error('请求超时，LLM 120 秒未响应'));
+      callbacks.onError?.(new Error('请求超时，LLM 300 秒未响应'));
     } else {
       callbacks.onError?.(new Error(`网络错误: ${err.message}`));
     }

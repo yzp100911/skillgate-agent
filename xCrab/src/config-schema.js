@@ -37,6 +37,22 @@ const CONFIG_SCHEMA = [
     errorMessage: 'DEEPSEEK_BASE_URL 必须是有效的 URL',
   },
   {
+    key: 'MIMO_API_KEY',
+    description: 'Mimo API 密钥',
+    required: false,
+    default: '',
+    validate: v => !v || v.startsWith('sk-') || v.length > 10,
+    errorMessage: 'MIMO_API_KEY 格式不正确',
+  },
+  {
+    key: 'MIMO_BASE_URL',
+    description: 'Mimo API 地址',
+    required: false,
+    default: 'https://api.xiaomimimo.com/v1',
+    validate: v => !v || v.startsWith('http'),
+    errorMessage: 'MIMO_BASE_URL 必须是有效的 URL',
+  },
+  {
     key: 'MODEL',
     description: '使用的模型名称',
     required: false,

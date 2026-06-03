@@ -1,0 +1,996 @@
+- generic [ref=e1]:
+  - img:
+    - generic "购买服务-icon@1x"
+    - generic "ic-开票":
+      - generic:
+        - generic:
+          - generic: 开票
+  - generic [ref=e3734]:
+    - menubar [ref=e3737]:
+      - generic [ref=e3738]:
+        - menuitem "工作台 " [expanded] [ref=e3740]:
+          - generic [ref=e3741] [cursor=pointer]:
+            - img [ref=e3742]
+            - text: 工作台
+            - generic [ref=e3744]: 
+          - menu [ref=e3745]:
+            - link "我的工作" [ref=e3746] [cursor=pointer]:
+              - /url: "#/dashboard/index"
+              - menuitem "我的工作" [ref=e3747]:
+                - generic [ref=e3748]: 我的工作
+            - link "我的数据" [ref=e3749] [cursor=pointer]:
+              - /url: "#/dashboard/myData"
+              - menuitem "我的数据" [ref=e3750]:
+                - generic [ref=e3751]: 我的数据
+        - link "房源" [ref=e3752] [cursor=pointer]:
+          - /url: "#/house/index"
+          - menuitem "房源" [active] [ref=e3753]:
+            - img [ref=e3754]
+            - text: 房源
+        - link "租约" [ref=e3756] [cursor=pointer]:
+          - /url: "#/lease/index"
+          - menuitem "租约" [ref=e3757]:
+            - img [ref=e3758]
+            - text: 租约
+        - menuitem "设备 " [ref=e3760]:
+          - generic [ref=e3761] [cursor=pointer]:
+            - img [ref=e3762]
+            - text: 设备
+            - generic [ref=e3764]: 
+        - menuitem "财务 " [ref=e3765]:
+          - generic [ref=e3766] [cursor=pointer]:
+            - img [ref=e3767]
+            - text: 财务
+            - generic [ref=e3769]: 
+        - menuitem "报表 " [ref=e3770]:
+          - generic [ref=e3771] [cursor=pointer]:
+            - img [ref=e3772]
+            - text: 报表
+            - generic [ref=e3774]: 
+        - menuitem "审核 " [ref=e3775]:
+          - generic [ref=e3776] [cursor=pointer]:
+            - img [ref=e3777]
+            - text: 审核
+            - generic [ref=e3779]: 
+        - link "招租" [ref=e3780] [cursor=pointer]:
+          - /url: "#/rent/index"
+          - menuitem "招租" [ref=e3781]:
+            - img [ref=e3782]
+            - text: 招租
+        - link "报修" [ref=e3784] [cursor=pointer]:
+          - /url: "#/repair/index"
+          - menuitem "报修" [ref=e3785]:
+            - img [ref=e3786]
+            - text: 报修
+        - menuitem "开票 " [ref=e3788]:
+          - generic [ref=e3789] [cursor=pointer]:
+            - img [ref=e3790]
+            - text: 开票
+            - generic [ref=e3792]: 
+        - menuitem "子账号 " [ref=e3793]:
+          - generic [ref=e3794] [cursor=pointer]:
+            - img [ref=e3795]
+            - text: 子账号
+            - generic [ref=e3797]: 
+        - link "帮助" [ref=e3798] [cursor=pointer]:
+          - /url: "#/helpCenter/index"
+          - menuitem "帮助" [ref=e3799]:
+            - img [ref=e3800]
+            - text: 帮助
+        - link "配置" [ref=e3802] [cursor=pointer]:
+          - /url: "#/configuration/index"
+          - menuitem "配置" [ref=e3803]:
+            - img [ref=e3804]
+            - text: 配置
+        - text: 
+    - generic [ref=e3806]:
+      - generic [ref=e3807]:
+        - menubar [ref=e3808]:
+          - img [ref=e3810] [cursor=pointer]
+          - navigation "Breadcrumb" [ref=e3814]:
+            - link "房源" [ref=e4275]
+          - generic [ref=e3817]:
+            - button "二维码" [ref=e3819] [cursor=pointer]:
+              - generic [ref=e3820]:
+                - img [ref=e3821]
+                - text: 二维码
+            - button "添加预定" [ref=e3823] [cursor=pointer]:
+              - generic [ref=e3824]:
+                - img [ref=e3825]
+                - text: 添加预定
+            - button "办理入住" [ref=e3827] [cursor=pointer]:
+              - generic [ref=e3828]:
+                - img [ref=e3829]
+                - text: 办理入住
+            - button "群发消息" [ref=e3832] [cursor=pointer]:
+              - generic [ref=e3833]:
+                - img [ref=e3834]
+                - text: 群发消息
+            - generic [ref=e3836]:
+              - button "消息通知" [ref=e3837] [cursor=pointer]:
+                - generic [ref=e3838]:
+                  - img [ref=e3839]
+                  - text: 消息通知
+              - superscript [ref=e3841]: 99+
+            - button "购买服务" [ref=e3843] [cursor=pointer]:
+              - generic [ref=e3844]:
+                - img [ref=e3845]
+                - text: 购买服务
+            - button "个人中心" [ref=e3848] [cursor=pointer]:
+              - img [ref=e3849]
+              - text: 个人中心
+        - text:             
+      - generic [ref=e4276]:
+        - generic [ref=e4277]:
+          - generic [ref=e4278]:
+            - generic [ref=e4280]:
+              - text: 房源筛选
+              - generic [ref=e4281]:
+                - textbox [ref=e4283]
+                - generic [ref=e4284]:
+                  - textbox "选择/搜索房源" [ref=e4285] [cursor=pointer]
+                  - generic [ref=e4287] [cursor=pointer]: 
+              - generic [ref=e4289]:
+                - textbox "选择按楼层查询" [disabled] [ref=e4290]
+                - generic [ref=e4292]: 
+              - textbox "搜索（房型/房间/住户名称）" [ref=e4294]
+            - generic [ref=e4296]:
+              - text: 户型筛选
+              - generic [ref=e4297]:
+                - textbox [ref=e4299]
+                - generic [ref=e4300]:
+                  - textbox "选择按户型查询" [ref=e4301] [cursor=pointer]
+                  - generic [ref=e4303] [cursor=pointer]: 
+              - text: 面积筛选
+              - generic [ref=e4304]:
+                - textbox [ref=e4306]
+                - generic [ref=e4307]:
+                  - textbox "选择按面积查询" [ref=e4308] [cursor=pointer]
+                  - generic [ref=e4310] [cursor=pointer]: 
+              - text: 租金筛选
+              - generic [ref=e4311]:
+                - textbox [ref=e4313]
+                - generic [ref=e4314]:
+                  - textbox "选择按租金查询" [ref=e4315] [cursor=pointer]
+                  - generic [ref=e4317] [cursor=pointer]: 
+              - text: 空置筛选
+              - generic [ref=e4318]:
+                - textbox [ref=e4320]
+                - generic [ref=e4321]:
+                  - textbox "选择按空置天数查询" [ref=e4322] [cursor=pointer]
+                  - generic [ref=e4324] [cursor=pointer]: 
+              - text: 标签筛选
+              - generic [ref=e4325]:
+                - textbox [ref=e4327]
+                - generic [ref=e4328]:
+                  - textbox "选择按房间标签查询" [ref=e4329] [cursor=pointer]
+                  - generic [ref=e4331] [cursor=pointer]: 
+          - generic [ref=e4332]:
+            - link "导出房态图" [ref=e4333] [cursor=pointer]:
+              - /url: https://gezorig.dongguanbank.cn/api/v2/rooms/status/export?label=0&buildingIds=&floors=
+              - generic [ref=e4334]:
+                - img [ref=e4335]
+                - text: 导出房态图
+            - generic [ref=e4336]:
+              - img [ref=e4337]
+              - text: 资产总览图
+            - button "批量操作 " [ref=e4339] [cursor=pointer]:
+              - text: 批量操作
+              - generic [ref=e4340]: 
+        - generic [ref=e4343]:
+          - button "全部·61" [ref=e4344] [cursor=pointer]:
+            - generic [ref=e4345]: 全部·61
+          - button "未出租·8" [ref=e4346] [cursor=pointer]:
+            - generic [ref=e4347]: 未出租·8
+          - button "已出租·53" [ref=e4348] [cursor=pointer]:
+            - generic [ref=e4349]: 已出租·53
+          - button "租约即将到期·23" [ref=e4350] [cursor=pointer]:
+            - generic [ref=e4351]: 租约即将到期·23
+          - button "租约过期·1" [ref=e4352] [cursor=pointer]:
+            - generic [ref=e4353]: 租约过期·1
+          - button "租约欠款·10" [ref=e4354] [cursor=pointer]:
+            - generic [ref=e4355]: 租约欠款·10
+          - button "已预定·0" [ref=e4356] [cursor=pointer]:
+            - generic [ref=e4357]: 已预定·0
+          - button "预定已过期·0" [ref=e4358] [cursor=pointer]:
+            - generic [ref=e4359]: 预定已过期·0
+          - button "待结算·0" [ref=e4360] [cursor=pointer]:
+            - generic [ref=e4361]: 待结算·0
+          - button "待审核·0" [ref=e4362] [cursor=pointer]:
+            - generic [ref=e4363]: 待审核·0
+          - button "占用·0" [ref=e4364] [cursor=pointer]:
+            - generic [ref=e4365]: 占用·0
+          - button "高级筛选" [ref=e4367] [cursor=pointer]:
+            - img [ref=e4368]
+            - text: 高级筛选
+        - generic [ref=e4370]:
+          - generic:
+            - generic:   
+            - text:  
+          - generic [ref=e4372]:
+            - generic [ref=e4373]: 有米公寓（石碣店）
+            - generic [ref=e4374]:
+              - link "管理房源" [ref=e4375] [cursor=pointer]:
+                - /url: javascript:;
+                - img [ref=e4376]
+                - text: 管理房源
+              - link "本栋招租二维码" [ref=e4377] [cursor=pointer]:
+                - /url: javascript:;
+                - img [ref=e4378]
+                - text: 本栋招租二维码
+          - generic [ref=e4381]:
+            - generic [ref=e4382]:
+              - heading "1层" [level=4] [ref=e4383]
+              - generic [ref=e4384]:
+                - link "编辑" [ref=e4385] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e4386] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e4387]:
+              - generic [ref=e4388]:
+                - generic [ref=e4389]: "101"
+                - generic [ref=e4390]:
+                  - generic [ref=e4391]:
+                    - generic [ref=e4392]: 欠
+                    - generic [ref=e4395]: 9天
+                  - generic [ref=e4396]:
+                    - generic [ref=e4397]: 快
+                    - generic [ref=e4400]: 21天
+              - paragraph [ref=e4401]: 0m²
+              - generic [ref=e4402]:
+                - generic [ref=e4403]: ￥1200.00
+                - generic [ref=e4404]:
+                  - img [ref=e4406]
+                  - generic [ref=e4407]: 彭艳阳
+            - generic [ref=e4409]:
+              - generic [ref=e4410]:
+                - generic [ref=e4411]: "102"
+                - generic [ref=e4413]:
+                  - generic [ref=e4414]: 空
+                  - generic [ref=e4417]: 22天
+              - paragraph [ref=e4418]: 0m²
+              - generic [ref=e4420]: ￥550.00
+          - generic [ref=e4424]:
+            - generic [ref=e4425]:
+              - heading "2层" [level=4] [ref=e4426]
+              - generic [ref=e4427]:
+                - link "编辑" [ref=e4428] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e4429] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e4430]:
+              - generic [ref=e4432]: "201"
+              - paragraph [ref=e4434]: 0m²
+              - generic [ref=e4435]:
+                - generic [ref=e4436]: ￥450.00
+                - generic [ref=e4437]:
+                  - generic [ref=e4438]:
+                    - img [ref=e4439]
+                    - img [ref=e4440]
+                  - generic [ref=e4441]: 韩阿龙
+            - generic [ref=e4443]:
+              - generic [ref=e4444]:
+                - generic [ref=e4445]: "202"
+                - generic [ref=e4447]:
+                  - generic [ref=e4448]: 欠
+                  - generic [ref=e4451]: 9天
+              - paragraph [ref=e4452]: 0m²
+              - generic [ref=e4453]:
+                - generic [ref=e4454]: ￥450.00
+                - generic [ref=e4455]:
+                  - generic [ref=e4456]:
+                    - img [ref=e4457]
+                    - img [ref=e4458]
+                  - generic [ref=e4459]: 彭平
+            - generic [ref=e4461]:
+              - generic [ref=e4462]:
+                - generic [ref=e4463]: "203"
+                - generic [ref=e4465]:
+                  - generic [ref=e4466]: 快
+                  - generic [ref=e4469]: 21天
+              - paragraph [ref=e4470]: 0m²
+              - generic [ref=e4471]:
+                - generic [ref=e4472]: ￥400.00
+                - generic [ref=e4473]:
+                  - generic [ref=e4474]:
+                    - img [ref=e4475]
+                    - img [ref=e4476]
+                  - generic [ref=e4477]: 胡小华
+            - generic [ref=e4479]:
+              - generic [ref=e4480]:
+                - generic [ref=e4481]: "205"
+                - generic [ref=e4483]:
+                  - generic [ref=e4484]: 快
+                  - generic [ref=e4487]: 21天
+              - paragraph [ref=e4488]: 0m²
+              - generic [ref=e4489]:
+                - generic [ref=e4490]: ￥450.00
+                - generic [ref=e4491]:
+                  - generic [ref=e4492]:
+                    - img [ref=e4493]
+                    - img [ref=e4494]
+                  - generic [ref=e4495]: 谢涌姣
+            - generic [ref=e4497]:
+              - generic [ref=e4498]:
+                - generic [ref=e4499]: "206"
+                - generic [ref=e4501]:
+                  - generic [ref=e4502]: 欠
+                  - generic [ref=e4505]: 9天
+              - paragraph [ref=e4506]: 0m²
+              - generic [ref=e4507]:
+                - generic [ref=e4508]: ￥350.00
+                - generic [ref=e4509]:
+                  - generic [ref=e4510]:
+                    - img [ref=e4511]
+                    - img [ref=e4512]
+                  - generic [ref=e4513]: 黎月梅
+            - generic [ref=e4515]:
+              - generic [ref=e4517]: "207"
+              - paragraph [ref=e4519]: 0m²
+              - generic [ref=e4520]:
+                - generic [ref=e4521]: ￥480.00
+                - generic [ref=e4522]:
+                  - generic [ref=e4523]:
+                    - img [ref=e4524]
+                    - img [ref=e4525]
+                  - generic [ref=e4526]: 侬光灿
+            - generic [ref=e4528]:
+              - generic [ref=e4529]:
+                - generic [ref=e4530]: "208"
+                - generic [ref=e4532]:
+                  - generic [ref=e4533]: 空
+                  - generic [ref=e4536]: 2天
+              - paragraph [ref=e4537]: 0m²
+              - generic [ref=e4539]: ￥510.00
+            - generic [ref=e4541]:
+              - generic [ref=e4543]: "209"
+              - paragraph [ref=e4545]: 0m²
+              - generic [ref=e4546]:
+                - generic [ref=e4547]: ￥550.00
+                - generic [ref=e4548]:
+                  - generic [ref=e4549]:
+                    - img [ref=e4550]
+                    - img [ref=e4551]
+                  - generic [ref=e4552]: 谢亮
+            - generic [ref=e4554]:
+              - generic [ref=e4556]: "210"
+              - paragraph [ref=e4558]: 0m²
+              - generic [ref=e4559]:
+                - generic [ref=e4560]: ￥550.00
+                - generic [ref=e4561]:
+                  - generic [ref=e4562]:
+                    - img [ref=e4563]
+                    - img [ref=e4564]
+                  - generic [ref=e4565]: 李志敏
+            - generic [ref=e4567]:
+              - generic [ref=e4569]: "211"
+              - paragraph [ref=e4571]: 0m²
+              - generic [ref=e4572]:
+                - generic [ref=e4573]: ￥550.00
+                - generic [ref=e4574]:
+                  - generic [ref=e4575]:
+                    - img [ref=e4576]
+                    - img [ref=e4577]
+                  - generic [ref=e4578]: 刘学伟
+          - generic [ref=e4582]:
+            - generic [ref=e4583]:
+              - heading "3层" [level=4] [ref=e4584]
+              - generic [ref=e4585]:
+                - link "编辑" [ref=e4586] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e4587] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e4588]:
+              - generic [ref=e4589]:
+                - generic [ref=e4590]: "301"
+                - generic [ref=e4592]:
+                  - generic [ref=e4593]: 空
+                  - generic [ref=e4596]: 31天
+              - paragraph [ref=e4597]: 0m²
+              - generic [ref=e4599]: ￥400.00
+            - generic [ref=e4601]:
+              - generic [ref=e4603]: "302"
+              - paragraph [ref=e4605]: 0m²
+              - generic [ref=e4606]:
+                - generic [ref=e4607]: ￥500.00
+                - generic [ref=e4608]:
+                  - img [ref=e4610]
+                  - generic [ref=e4611]: 谭超俊
+            - generic [ref=e4613]:
+              - generic [ref=e4615]: "303"
+              - paragraph [ref=e4617]: 0m²
+              - generic [ref=e4618]:
+                - generic [ref=e4619]: ￥500.00
+                - generic [ref=e4620]:
+                  - generic [ref=e4621]:
+                    - img [ref=e4622]
+                    - img [ref=e4623]
+                  - generic [ref=e4624]: 赵国佑
+            - generic [ref=e4626]:
+              - generic [ref=e4628]: "305"
+              - paragraph [ref=e4630]: 0m²
+              - generic [ref=e4631]:
+                - generic [ref=e4632]: ￥500.00
+                - generic [ref=e4633]:
+                  - generic [ref=e4634]:
+                    - img [ref=e4635]
+                    - img [ref=e4636]
+                  - generic [ref=e4637]: 张耀丰
+            - generic [ref=e4639]:
+              - generic [ref=e4641]: "306"
+              - paragraph [ref=e4643]: 0m²
+              - generic [ref=e4644]:
+                - generic [ref=e4645]: ￥350.00
+                - generic [ref=e4646]:
+                  - generic [ref=e4647]:
+                    - img [ref=e4648]
+                    - img [ref=e4649]
+                  - generic [ref=e4650]: 时萧晴
+            - generic [ref=e4652]:
+              - generic [ref=e4654]: "307"
+              - paragraph [ref=e4656]: 0m²
+              - generic [ref=e4657]:
+                - generic [ref=e4658]: ￥600.00
+                - generic [ref=e4659]:
+                  - generic [ref=e4660]:
+                    - img [ref=e4661]
+                    - img [ref=e4662]
+                  - generic [ref=e4663]: 余学洲
+            - generic [ref=e4665]:
+              - generic [ref=e4666]:
+                - generic [ref=e4667]: "308"
+                - generic [ref=e4669]:
+                  - generic [ref=e4670]: 空
+                  - generic [ref=e4673]: 2天
+              - paragraph [ref=e4674]: 0m²
+              - generic [ref=e4676]: ￥650.00
+            - generic [ref=e4678]:
+              - generic [ref=e4679]:
+                - generic [ref=e4680]: "309"
+                - generic [ref=e4682]:
+                  - generic [ref=e4683]: 快
+                  - generic [ref=e4686]: 21天
+              - paragraph [ref=e4687]: 0m²
+              - generic [ref=e4688]:
+                - generic [ref=e4689]: ￥650.00
+                - generic [ref=e4690]:
+                  - generic [ref=e4691]:
+                    - img [ref=e4692]
+                    - img [ref=e4693]
+                  - generic [ref=e4694]: 王永飞
+            - generic [ref=e4696]:
+              - generic [ref=e4698]: "310"
+              - paragraph [ref=e4700]: 0m²
+              - generic [ref=e4701]:
+                - generic [ref=e4702]: ￥500.00
+                - generic [ref=e4703]:
+                  - generic [ref=e4704]:
+                    - img [ref=e4705]
+                    - img [ref=e4706]
+                  - generic [ref=e4707]: 陈凤英
+            - generic [ref=e4709]:
+              - generic [ref=e4711]: "311"
+              - paragraph [ref=e4713]: 0m²
+              - generic [ref=e4714]:
+                - generic [ref=e4715]: ￥600.00
+                - generic [ref=e4716]:
+                  - generic [ref=e4717]:
+                    - img [ref=e4718]
+                    - img [ref=e4719]
+                  - generic [ref=e4720]: 全二培
+          - generic [ref=e4724]:
+            - generic [ref=e4725]:
+              - heading "4层" [level=4] [ref=e4726]
+              - generic [ref=e4727]:
+                - link "编辑" [ref=e4728] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e4729] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e4730]:
+              - generic [ref=e4731]:
+                - generic [ref=e4732]: "401"
+                - generic [ref=e4734]:
+                  - generic [ref=e4735]: 快
+                  - generic [ref=e4738]: 21天
+              - paragraph [ref=e4739]: 0m²
+              - generic [ref=e4740]:
+                - generic [ref=e4741]: ￥450.00
+                - generic [ref=e4742]:
+                  - generic [ref=e4743]:
+                    - img [ref=e4744]
+                    - img [ref=e4745]
+                  - generic [ref=e4746]: 张宗明
+            - generic [ref=e4748]:
+              - generic [ref=e4750]: "402"
+              - paragraph [ref=e4752]: 0m²
+              - generic [ref=e4753]:
+                - generic [ref=e4754]: ￥500.00
+                - generic [ref=e4755]:
+                  - generic [ref=e4756]:
+                    - img [ref=e4757]
+                    - img [ref=e4758]
+                  - generic [ref=e4759]: 谢毅
+            - generic [ref=e4761]:
+              - generic [ref=e4763]: "403"
+              - paragraph [ref=e4765]: 0m²
+              - generic [ref=e4766]:
+                - generic [ref=e4767]: ￥500.00
+                - generic [ref=e4768]:
+                  - generic [ref=e4769]:
+                    - img [ref=e4770]
+                    - img [ref=e4771]
+                  - generic [ref=e4772]: 潘星黔
+            - generic [ref=e4774]:
+              - generic [ref=e4775]:
+                - generic [ref=e4776]: "405"
+                - generic [ref=e4778]:
+                  - generic [ref=e4779]: 快
+                  - generic [ref=e4782]: 21天
+              - paragraph [ref=e4783]: 0m²
+              - generic [ref=e4784]:
+                - generic [ref=e4785]: ￥500.00
+                - generic [ref=e4786]:
+                  - generic [ref=e4787]:
+                    - img [ref=e4788]
+                    - img [ref=e4789]
+                  - generic [ref=e4790]: 保洁
+            - generic [ref=e4792]:
+              - generic [ref=e4793]:
+                - generic [ref=e4794]: "406"
+                - generic [ref=e4796]:
+                  - generic [ref=e4797]: 空
+                  - generic [ref=e4800]: 22天
+              - paragraph [ref=e4801]: 0m²
+              - generic [ref=e4803]: ￥600.00
+            - generic [ref=e4805]:
+              - generic [ref=e4807]: "407"
+              - paragraph [ref=e4809]: 0m²
+              - generic [ref=e4810]:
+                - generic [ref=e4811]: ￥550.00
+                - generic [ref=e4812]:
+                  - generic [ref=e4813]:
+                    - img [ref=e4814]
+                    - img [ref=e4815]
+                  - generic [ref=e4816]: 周堂
+            - generic [ref=e4818]:
+              - generic [ref=e4819]:
+                - generic [ref=e4820]: "408"
+                - generic [ref=e4821]:
+                  - generic [ref=e4822]:
+                    - generic [ref=e4823]: 欠
+                    - generic [ref=e4826]: 9天
+                  - generic [ref=e4827]:
+                    - generic [ref=e4828]: 快
+                    - generic [ref=e4831]: 22天
+              - paragraph [ref=e4832]: 0m²
+              - generic [ref=e4833]:
+                - generic [ref=e4834]: ￥600.00
+                - generic [ref=e4835]:
+                  - generic [ref=e4836]:
+                    - img [ref=e4837]
+                    - img [ref=e4838]
+                  - generic [ref=e4839]: 钟光红
+            - generic [ref=e4841]:
+              - generic [ref=e4842]:
+                - generic [ref=e4843]: "409"
+                - generic [ref=e4845]:
+                  - generic [ref=e4846]: 快
+                  - generic [ref=e4849]: 21天
+              - paragraph [ref=e4850]: 0m²
+              - generic [ref=e4851]:
+                - generic [ref=e4852]: ￥600.00
+                - generic [ref=e4853]:
+                  - generic [ref=e4854]:
+                    - img [ref=e4855]
+                    - img [ref=e4856]
+                  - generic [ref=e4857]: 陈新
+            - generic [ref=e4859]:
+              - generic [ref=e4860]:
+                - generic [ref=e4861]: "410"
+                - generic [ref=e4863]:
+                  - generic [ref=e4864]: 欠
+                  - generic [ref=e4867]: 9天
+              - paragraph [ref=e4868]: 0m²
+              - generic [ref=e4869]:
+                - generic [ref=e4870]: ￥550.00
+                - generic [ref=e4871]:
+                  - generic [ref=e4872]:
+                    - img [ref=e4873]
+                    - img [ref=e4874]
+                  - generic [ref=e4875]: 王朋
+            - generic [ref=e4877]:
+              - generic [ref=e4878]:
+                - generic [ref=e4879]: "411"
+                - generic [ref=e4880]:
+                  - generic [ref=e4881]:
+                    - generic [ref=e4882]: 欠
+                    - generic [ref=e4885]: 9天
+                  - generic [ref=e4886]:
+                    - generic [ref=e4887]: 快
+                    - generic [ref=e4890]: 21天
+              - paragraph [ref=e4891]: 0m²
+              - generic [ref=e4892]:
+                - generic [ref=e4893]: ￥600.00
+                - generic [ref=e4894]:
+                  - generic [ref=e4895]:
+                    - img [ref=e4896]
+                    - img [ref=e4897]
+                  - generic [ref=e4898]: 盛淮安
+          - generic [ref=e4902]:
+            - generic [ref=e4903]:
+              - heading "5层" [level=4] [ref=e4904]
+              - generic [ref=e4905]:
+                - link "编辑" [ref=e4906] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e4907] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e4908]:
+              - generic [ref=e4909]:
+                - generic [ref=e4910]: "501"
+                - generic [ref=e4912]:
+                  - generic [ref=e4913]: 快
+                  - generic [ref=e4916]: 21天
+              - paragraph [ref=e4917]: 0m²
+              - generic [ref=e4918]:
+                - generic [ref=e4919]: ￥450.00
+                - generic [ref=e4920]:
+                  - generic [ref=e4921]:
+                    - img [ref=e4922]
+                    - img [ref=e4923]
+                  - generic [ref=e4924]: 张知玉
+            - generic [ref=e4926]:
+              - generic [ref=e4927]:
+                - generic [ref=e4928]: "502"
+                - generic [ref=e4930]:
+                  - generic [ref=e4931]: 快
+                  - generic [ref=e4934]: 21天
+              - paragraph [ref=e4935]: 0m²
+              - generic [ref=e4936]:
+                - generic [ref=e4937]: ￥450.00
+                - generic [ref=e4938]:
+                  - generic [ref=e4939]:
+                    - img [ref=e4940]
+                    - img [ref=e4941]
+                  - generic [ref=e4942]: 段君红
+            - generic [ref=e4944]:
+              - generic [ref=e4945]:
+                - generic [ref=e4946]: "503"
+                - generic [ref=e4948]:
+                  - generic [ref=e4949]: 快
+                  - generic [ref=e4952]: 21天
+              - paragraph [ref=e4953]: 0m²
+              - generic [ref=e4954]:
+                - generic [ref=e4955]: ￥450.00
+                - generic [ref=e4956]:
+                  - generic [ref=e4957]:
+                    - img [ref=e4958]
+                    - img [ref=e4959]
+                  - generic [ref=e4960]: 张佳宁
+            - generic [ref=e4962]:
+              - generic [ref=e4963]:
+                - generic [ref=e4964]: "505"
+                - generic [ref=e4965]:
+                  - generic [ref=e4966]:
+                    - generic [ref=e4967]: 欠
+                    - generic [ref=e4970]: 9天
+                  - generic [ref=e4971]:
+                    - generic [ref=e4972]: 快
+                    - generic [ref=e4975]: 21天
+              - paragraph [ref=e4976]: 0m²
+              - generic [ref=e4977]:
+                - generic [ref=e4978]: ￥530.00
+                - generic [ref=e4979]:
+                  - generic [ref=e4980]:
+                    - img [ref=e4981]
+                    - img [ref=e4982]
+                  - generic [ref=e4983]: 陈艺
+            - generic [ref=e4985]:
+              - generic [ref=e4987]: "506"
+              - paragraph [ref=e4989]: 0m²
+              - generic [ref=e4990]:
+                - generic [ref=e4991]: ￥370.00
+                - generic [ref=e4992]:
+                  - generic [ref=e4993]:
+                    - img [ref=e4994]
+                    - img [ref=e4995]
+                  - generic [ref=e4996]: 罗春义
+            - generic [ref=e4998]:
+              - generic [ref=e4999]:
+                - generic [ref=e5000]: "507"
+                - generic [ref=e5002]:
+                  - generic [ref=e5003]: 快
+                  - generic [ref=e5006]: 21天
+              - paragraph [ref=e5007]: 0m²
+              - generic [ref=e5008]:
+                - generic [ref=e5009]: ￥600.00
+                - generic [ref=e5010]:
+                  - generic [ref=e5011]:
+                    - img [ref=e5012]
+                    - img [ref=e5013]
+                  - generic [ref=e5014]: 黄金建
+            - generic [ref=e5016]:
+              - generic [ref=e5018]: "508"
+              - paragraph [ref=e5020]: 0m²
+              - generic [ref=e5021]:
+                - generic [ref=e5022]: ￥600.00
+                - generic [ref=e5023]:
+                  - generic [ref=e5024]:
+                    - img [ref=e5025]
+                    - img [ref=e5026]
+                  - generic [ref=e5027]: 宋汉武
+            - generic [ref=e5029]:
+              - generic [ref=e5030]:
+                - generic [ref=e5031]: "509"
+                - generic [ref=e5033]:
+                  - generic [ref=e5034]: 快
+                  - generic [ref=e5037]: 21天
+              - paragraph [ref=e5038]: 0m²
+              - generic [ref=e5039]:
+                - generic [ref=e5040]: ￥600.00
+                - generic [ref=e5041]:
+                  - generic [ref=e5042]:
+                    - img [ref=e5043]
+                    - img [ref=e5044]
+                  - generic [ref=e5045]: 李荣子
+            - generic [ref=e5047]:
+              - generic [ref=e5048]:
+                - generic [ref=e5049]: "510"
+                - generic [ref=e5051]:
+                  - generic [ref=e5052]: 空
+                  - generic [ref=e5055]: 2天
+              - paragraph [ref=e5056]: 0m²
+              - generic [ref=e5058]: ￥600.00
+            - generic [ref=e5060]:
+              - generic [ref=e5061]:
+                - generic [ref=e5062]: "511"
+                - generic [ref=e5064]:
+                  - generic [ref=e5065]: 快
+                  - generic [ref=e5068]: 21天
+              - paragraph [ref=e5069]: 0m²
+              - generic [ref=e5070]:
+                - generic [ref=e5071]: ￥600.00
+                - generic [ref=e5072]:
+                  - generic [ref=e5073]:
+                    - img [ref=e5074]
+                    - img [ref=e5075]
+                  - generic [ref=e5076]: 王博文
+          - generic [ref=e5080]:
+            - generic [ref=e5081]:
+              - heading "6层" [level=4] [ref=e5082]
+              - generic [ref=e5083]:
+                - link "编辑" [ref=e5084] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e5085] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e5086]:
+              - generic [ref=e5088]: "601"
+              - paragraph [ref=e5090]: 0m²
+              - generic [ref=e5091]:
+                - generic [ref=e5092]: ￥500.00
+                - generic [ref=e5093]:
+                  - generic [ref=e5094]:
+                    - img [ref=e5095]
+                    - img [ref=e5096]
+                  - generic [ref=e5097]: 李翠杏
+            - generic [ref=e5099]:
+              - generic [ref=e5101]: "602"
+              - paragraph [ref=e5103]: 0m²
+              - generic [ref=e5104]:
+                - generic [ref=e5105]: ￥500.00
+                - generic [ref=e5106]:
+                  - generic [ref=e5107]:
+                    - img [ref=e5108]
+                    - img [ref=e5109]
+                  - generic [ref=e5110]: 陈凤英
+            - generic [ref=e5112]:
+              - generic [ref=e5113]:
+                - generic [ref=e5114]: "603"
+                - generic [ref=e5115]:
+                  - generic [ref=e5116]:
+                    - generic [ref=e5117]: 欠
+                    - generic [ref=e5120]: 9天
+                  - generic [ref=e5121]:
+                    - generic [ref=e5122]: 快
+                    - generic [ref=e5125]: 21天
+              - paragraph [ref=e5126]: 0m²
+              - generic [ref=e5127]:
+                - generic [ref=e5128]: ￥500.00
+                - generic [ref=e5129]:
+                  - img [ref=e5131]
+                  - generic [ref=e5132]: 黄水富
+            - generic [ref=e5134]:
+              - generic [ref=e5135]:
+                - generic [ref=e5136]: "605"
+                - generic [ref=e5138]:
+                  - generic [ref=e5139]: 快
+                  - generic [ref=e5142]: 21天
+              - paragraph [ref=e5143]: 0m²
+              - generic [ref=e5144]:
+                - generic [ref=e5145]: ￥500.00
+                - generic [ref=e5146]:
+                  - generic [ref=e5147]:
+                    - img [ref=e5148]
+                    - img [ref=e5149]
+                  - generic [ref=e5150]: 李少群
+            - generic [ref=e5152]:
+              - generic [ref=e5153]:
+                - generic [ref=e5154]: "606"
+                - generic [ref=e5156]:
+                  - generic [ref=e5157]: 空
+                  - generic [ref=e5160]: 33天
+              - paragraph [ref=e5161]: 0m²
+              - generic [ref=e5163]: ￥400.00
+            - generic [ref=e5165]:
+              - generic [ref=e5167]: "607"
+              - paragraph [ref=e5169]: 0m²
+              - generic [ref=e5170]:
+                - generic [ref=e5171]: ￥450.00
+                - generic [ref=e5172]:
+                  - img [ref=e5174]
+                  - generic [ref=e5175]: 杨一方
+            - generic [ref=e5177]:
+              - generic [ref=e5179]: "608"
+              - paragraph [ref=e5181]: 0m²
+              - generic [ref=e5182]:
+                - generic [ref=e5183]: ￥550.00
+                - generic [ref=e5184]:
+                  - generic [ref=e5185]:
+                    - img [ref=e5186]
+                    - img [ref=e5187]
+                  - generic [ref=e5188]: 林丽霞
+            - generic [ref=e5190]:
+              - generic [ref=e5191]:
+                - generic [ref=e5192]: "609"
+                - generic [ref=e5194]:
+                  - generic [ref=e5195]: 快
+                  - generic [ref=e5198]: 21天
+              - paragraph [ref=e5199]: 0m²
+              - generic [ref=e5200]:
+                - generic [ref=e5201]: ￥600.00
+                - generic [ref=e5202]:
+                  - generic [ref=e5203]:
+                    - img [ref=e5204]
+                    - img [ref=e5205]
+                  - generic [ref=e5206]: 赵远斌
+            - generic [ref=e5208]:
+              - generic [ref=e5209]:
+                - generic [ref=e5210]: "610"
+                - generic [ref=e5212]:
+                  - generic [ref=e5213]: 欠
+                  - generic [ref=e5216]: 9天
+              - paragraph [ref=e5217]: 0m²
+              - generic [ref=e5218]:
+                - generic [ref=e5219]: ￥600.00
+                - generic [ref=e5220]:
+                  - generic [ref=e5221]:
+                    - img [ref=e5222]
+                    - img [ref=e5223]
+                  - generic [ref=e5224]: 梁峻荣
+            - generic [ref=e5226]:
+              - generic [ref=e5228]: "611"
+              - paragraph [ref=e5230]: 0m²
+              - generic [ref=e5231]:
+                - generic [ref=e5232]: ￥600.00
+                - generic [ref=e5233]:
+                  - generic [ref=e5234]:
+                    - img [ref=e5235]
+                    - img [ref=e5236]
+                  - generic [ref=e5237]: 杨谭帅
+          - generic [ref=e5241]:
+            - generic [ref=e5242]:
+              - heading "7层" [level=4] [ref=e5243]
+              - generic [ref=e5244]:
+                - link "编辑" [ref=e5245] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e5246] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e5247]:
+              - generic [ref=e5248]:
+                - generic [ref=e5249]: "701"
+                - generic [ref=e5251]:
+                  - generic [ref=e5252]: 快
+                  - generic [ref=e5255]: 21天
+              - paragraph [ref=e5256]: 0m²
+              - generic [ref=e5257]:
+                - generic [ref=e5258]: ￥460.00
+                - generic [ref=e5259]:
+                  - generic [ref=e5260]:
+                    - img [ref=e5261]
+                    - img [ref=e5262]
+                  - generic [ref=e5263]: 黄舒愉
+            - generic [ref=e5265]:
+              - generic [ref=e5266]:
+                - generic [ref=e5267]: "702"
+                - generic [ref=e5269]:
+                  - generic [ref=e5270]: 快
+                  - generic [ref=e5273]: 21天
+              - paragraph [ref=e5274]: 0m²
+              - generic [ref=e5275]:
+                - generic [ref=e5276]: ￥450.00
+                - generic [ref=e5277]:
+                  - generic [ref=e5278]:
+                    - img [ref=e5279]
+                    - img [ref=e5280]
+                  - generic [ref=e5281]: 李艳萍
+            - generic [ref=e5283]:
+              - generic [ref=e5284]:
+                - generic [ref=e5285]: "703"
+                - generic [ref=e5287]:
+                  - generic [ref=e5288]: 快
+                  - generic [ref=e5291]: 21天
+              - paragraph [ref=e5292]: 0m²
+              - generic [ref=e5293]:
+                - generic [ref=e5294]: ￥450.00
+                - generic [ref=e5295]:
+                  - generic [ref=e5296]:
+                    - img [ref=e5297]
+                    - img [ref=e5298]
+                  - generic [ref=e5299]: 张婷
+            - generic [ref=e5301]:
+              - generic [ref=e5303]: "705"
+              - paragraph [ref=e5305]: 0m²
+              - generic [ref=e5306]:
+                - generic [ref=e5307]: ￥490.00
+                - generic [ref=e5308]:
+                  - generic [ref=e5309]:
+                    - img [ref=e5310]
+                    - img [ref=e5311]
+                  - generic [ref=e5312]: 郭美
+            - generic [ref=e5314]:
+              - generic [ref=e5316]: "706"
+              - paragraph [ref=e5318]: 0m²
+              - generic [ref=e5319]:
+                - generic [ref=e5320]: ￥500.00
+                - generic [ref=e5321]:
+                  - generic [ref=e5322]:
+                    - img [ref=e5323]
+                    - img [ref=e5324]
+                  - generic [ref=e5325]: 季文洁
+            - generic [ref=e5327]:
+              - generic [ref=e5329]: "707"
+              - paragraph [ref=e5331]: 0m²
+              - generic [ref=e5332]:
+                - generic [ref=e5333]: ￥440.00
+                - generic [ref=e5334]:
+                  - generic [ref=e5335]:
+                    - img [ref=e5336]
+                    - img [ref=e5337]
+                  - generic [ref=e5338]: 陈贤强
+            - generic [ref=e5340]:
+              - generic [ref=e5341]:
+                - generic [ref=e5342]: "708"
+                - generic [ref=e5343]:
+                  - generic [ref=e5344]:
+                    - generic [ref=e5345]: 欠
+                    - generic [ref=e5348]: 9天
+                  - generic [ref=e5349]:
+                    - generic [ref=e5350]: 快
+                    - generic [ref=e5353]: 21天
+              - paragraph [ref=e5354]: 0m²
+              - generic [ref=e5355]:
+                - generic [ref=e5356]: ￥0.00
+                - generic [ref=e5357]:
+                  - img [ref=e5359]
+                  - generic [ref=e5360]: 员工宿舍
+            - generic [ref=e5362]:
+              - generic [ref=e5363]:
+                - generic [ref=e5364]: "709"
+                - generic [ref=e5366]:
+                  - generic [ref=e5367]: 逾
+                  - generic [ref=e5370]: 10天
+              - paragraph [ref=e5371]: 0m²
+              - generic [ref=e5372]:
+                - generic [ref=e5373]: ￥0.00
+                - generic [ref=e5374]:
+                  - img [ref=e5376]
+                  - generic [ref=e5377]: 员工宿舍
+            - generic [ref=e5379]:
+              - generic [ref=e5380]:
+                - generic [ref=e5381]: "710"
+                - generic [ref=e5383]:
+                  - generic [ref=e5384]: 空
+                  - generic [ref=e5387]: 22天
+              - paragraph [ref=e5388]: 0m²
+              - generic [ref=e5390]: ￥500.00
+        - text:                      
+    - generic: 

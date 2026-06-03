@@ -263,16 +263,19 @@ export function createApiHandler(deps) {
             content: content || null,
             tool_calls: roundToolCalls,
           };
-          if (getModel() === 'deepseek-v4-flash' && reasoning) {
+          if (getModel().startsWith('deepseek-v4-flash') && reasoning) {
             assistantMsg.reasoning_content = reasoning.replace(/<\/?think>/g, '');
           }
           history.addAssistantMessage(assistantMsg);
 
+          // 并行执行同一轮所有工具调用
+          const toolStartTimes = [];
           for (let i = 0; i < roundToolCalls.length; i++) {
             const tc = roundToolCalls[i];
             const toolStartTime = Date.now();
+            toolStartTimes.push(toolStartTime);
 
-            // 增强的 tool_call 事件：包含步骤编号和时间戳
+            // 先发送所有 tool_call 事件
             pushSSE(sid, {
               type: 'tool_call',
               data: {
@@ -283,11 +286,15 @@ export function createApiHandler(deps) {
                 timestamp: toolStartTime,
               },
             });
+          }
 
+          // 并行执行所有工具
+          const toolResults = await Promise.all(roundToolCalls.map((tc, i) => {
+            const toolStartTime = toolStartTimes[i];
             let args;
             try { args = JSON.parse(tc.function.arguments); } catch { args = {}; }
 
-            // 实时进度计时器：每秒推送 tool_progress 事件
+            // 实时进度计时器
             const progressTimer = setInterval(() => {
               const elapsed = Math.floor((Date.now() - toolStartTime) / 1000);
               if (elapsed > 0) {
@@ -298,22 +305,42 @@ export function createApiHandler(deps) {
               }
             }, 1000);
 
-            const result = await executeTool(tc.function.name, args);
-            clearInterval(progressTimer);
+            return executeTool(tc.function.name, args).then(result => {
+              clearInterval(progressTimer);
+              const durationMs = Date.now() - toolStartTime;
 
-            const durationMs = Date.now() - toolStartTime;
+              // 推送 tool_result 事件
+              pushSSE(sid, {
+                type: 'tool_result',
+                data: {
+                  name: tc.function.name,
+                  result: result.slice(0, 500),
+                  durationMs,
+                },
+              });
 
-            history.addToolResult(tc.id, result);
+              return { tc, result };
+            }).catch(err => {
+              clearInterval(progressTimer);
+              const durationMs = Date.now() - toolStartTime;
+              const errMsg = `错误: ${err.message}`;
 
-            // 增强的 tool_result 事件：包含执行耗时
-            pushSSE(sid, {
-              type: 'tool_result',
-              data: {
-                name: tc.function.name,
-                result: result.slice(0, 500),
-                durationMs,
-              },
+              pushSSE(sid, {
+                type: 'tool_result',
+                data: {
+                  name: tc.function.name,
+                  result: errMsg.slice(0, 500),
+                  durationMs,
+                },
+              });
+
+              return { tc, result: errMsg };
             });
+          }));
+
+          // 按顺序将结果加入历史（保持 LLM 上下文一致性）
+          for (const { tc, result } of toolResults) {
+            history.addToolResult(tc.id, result);
           }
           continue;
         }
@@ -322,7 +349,7 @@ export function createApiHandler(deps) {
         {
           const { content, reasoning } = extractReasoning(streamContent);
           const finalMsg = { role: 'assistant', content: content || null };
-          if (getModel() === 'deepseek-v4-flash' && reasoning) {
+          if (getModel().startsWith('deepseek-v4-flash') && reasoning) {
             finalMsg.reasoning_content = reasoning.replace(/<\/?think>/g, '');
           }
           history.addAssistantMessage(finalMsg);
@@ -424,18 +451,19 @@ export function createApiHandler(deps) {
   /** 获取当前模型 */
   router.get('/current_model', (req, res) => {
     const modelName = getModel();
-    res.json({ code: 200, data: { model: modelName === 'MiniMax-M2.7' ? 'minimax' : 'deepseek', name: modelName } });
+    const modelKey = modelName === 'MiniMax-M2.7' ? 'minimax' : modelName.startsWith('mimo-v2.5-pro') ? 'mimo' : 'deepseek';
+    res.json({ code: 200, data: { model: modelKey, name: modelName } });
   });
 
   /** 切换模型 */
   router.post('/switch_model', (req, res) => {
     try {
       const { model } = req.body;
-      if (!model || !['deepseek', 'minimax'].includes(model)) {
-        return res.status(400).json({ code: 400, message: '无效的模型参数，可选: deepseek, minimax' });
+      if (!model || !['deepseek', 'minimax', 'mimo'].includes(model)) {
+        return res.status(400).json({ code: 400, message: '无效的模型参数，可选: deepseek, minimax, mimo' });
       }
 
-      const modelName = model === 'deepseek' ? 'deepseek-v4-flash' : 'MiniMax-M2.7';
+      const modelName = model === 'deepseek' ? 'deepseek-v4-flash[1M]' : model === 'mimo' ? 'mimo-v2.5-pro[1M]' : 'MiniMax-M2.7';
       const currentModel = getModel();
       if (currentModel === modelName) {
         return res.json({ code: 200, message: `当前已经是 ${modelName}`, model: modelName });

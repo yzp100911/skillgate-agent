@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "profiles": {
+    "minimax-portal:default": {
+      "type": "oauth",
+      "provider": "minimax-portal",
+      "access": "sk-cp-R8WSfrBc5nuT-YTIh6xE0lW3GkgCgVE3bRrbwkWj8iEhfDahq_VaXpFsqzmY1V6g2U3bZXh2VwyMVvpKxP8K1gQJFSmuzWM1mGFeuL_IDA1eIlHcmCmJrGs",
+      "refresh": "1vdDL101aDL1fissNpZTXgFhI1kx7W7-t34zuAh5dc8=",
+      "expires": 1809069824868
+    },
+    "openai-codex:default": {
+      "type": "oauth",
+      "provider": "openai-codex",
+      "access": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjE5MzQ0ZTY1LWJiYzktNDRkMS1hOWQwLWY5NTdiMDc5YmQwZSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS92MSJdLCJjbGllbnRfaWQiOiJhcHBfRU1vYW1FRVo3M2YwQ2tYYVhwN2hyYW5uIiwiZXhwIjoxNzc1Mjg3NzMwLCJodHRwczovL2FwaS5vcGVuYWkuY29tL2F1dGgiOnsiY2hhdGdwdF9hY2NvdW50X2lkIjoiMGYzNDM2YTctNDg3NC00NWUxLWI3ZWMtNmIxMDdkZmQ1ODBlIiwiY2hhdGdwdF9hY2NvdW50X3VzZXJfaWQiOiJ1c2VyLTZ5b2F1SmRqWE0zVGlMd1lhQk1GdWxSZF9fMGYzNDM2YTctNDg3NC00NWUxLWI3ZWMtNmIxMDdkZmQ1ODBlIiwiY2hhdGdwdF9jb21wdXRlX3Jlc2lkZW5jeSI6Im5vX2NvbnN0cmFpbnQiLCJjaGF0Z3B0X3BsYW5fdHlwZSI6ImZyZWUiLCJjaGF0Z3B0X3VzZXJfaWQiOiJ1c2VyLTZ5b2F1SmRqWE0zVGlMd1lhQk1GdWxSZCIsImxvY2FsaG9zdCI6dHJ1ZSwidXNlcl9pZCI6InVzZXItNnlvYXVKZGpYTTNUaUx3WWFCTUZ1bFJkIn0sImh0dHBzOi8vYXBpLm9wZW5haS5jb20vcHJvZmlsZSI6eyJlbWFpbCI6Inl6cDEwMDkxMTJAMTYzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwiaWF0IjoxNzc0NDIzNzI5LCJpc3MiOiJodHRwczovL2F1dGgub3BlbmFpLmNvbSIsImp0aSI6IjY1ZjdjODA2LWFjYTAtNGI1MC1iN2M1LWFkOGQwZTlkMTMwMCIsIm5iZiI6MTc3NDQyMzcyOSwicHdkX2F1dGhfdGltZSI6MTc3NDQyMzcyNjE3OCwic2NwIjpbIm9wZW5pZCIsInByb2ZpbGUiLCJlbWFpbCIsIm9mZmxpbmVfYWNjZXNzIiwiYXBpLmNvbm5lY3RvcnMucmVhZCIsImFwaS5jb25uZWN0b3JzLmludm9rZSJdLCJzZXNzaW9uX2lkIjoiYXV0aHNlc3NfcVhUc0M0MEUxb1JRNzZ3WFRrWlpwc2FkIiwic2wiOnRydWUsInN1YiI6ImF1dGgwfEkzSHh1QzR0QUR2SkZpU2hUV2Fnb3JaNCJ9.1EW_MvpL6s6eExE-w-KZzJlQf-_E_EAMeCJTuurZTWpRAcYpsFf4BK7oZUYNQR5G2K0vY5UTgpK6SaLSeay6fvPk1tBg2ShDdkTz0PiDnt9QfgE9hkzxdkBCuYhQAaCcUVIChk4nYVrU4LFHhZGK-iLvKMiuqbmRgzzkBVt2WhYct2axHuDQMhb759F7903mhGIK8qeyhUHGLCjuFR_M6j0VOPEqiLySyJeJGMfeHjlP5qaZaCLtleGdVcmRjd4XU64zaO9OHFQxM7x9Wg0-9_Y7wu9Dx8aEH2Mvj8ob8mc2iXKw_FJ_ZmlpbGwUbPMhCV1oiWFzy3U9y-ViwcNMFXH8wPQZORX6be5HMl3QAhmBE0eGbvvyAMiOxuvdQurur51ca82Pf6totqCJ7dCEsJGGFlhU4baFikRTnu-wN7ogS-Mo3fmaubF1Te4gRNc6yYJ4UPaIkYJIkrLOORfTe6WfeJzKaGxMG3N-4lD-_9suGpnx9rbkGHxxKNYwV4F7RAqmmM02SA-wJI-KL3xqzIsxHQIirx8cD8BFv_A4HYY5cqfNtwrKXaaWiCI6FUb7SPyU_pFQjjjkBS2TjfPTch9EjPw3rel13QB8dtXKLegmo2Xf3rSADz0oOoL6w8UBdAG-GA8xxK6ZMpnzFvtAK2YLVnULnoAhmFmDiI-s-CQ",
+      "refresh": "oaistb_rt_Ke82Yuep6udBfb7I0kwtZZW_aYPKqfiffwdA_1bvc0g.S0EnkYPInc64I2o6kO-rb5pbqFMdaEiL_UnQ6Ie_XKU",
+      "expires": 1775287730000,
+      "accountId": "0f3436a7-4874-45e1-b7ec-6b107dfd580e"
+    },
+    "minimax:cn": {
+      "type": "api_key",
+      "provider": "minimax",
+      "key": "sk-cp-w_-_nNk1OzVjSev4wMCrFAvaQdw_CSDiyBX7BqQuLyFaS71CfDHMz3C7mg-nnUvtP9HFvTdoWUgv8cMVSsyAbR3BFslWYmO0DOgN_me2QWMCryvdwwfNUWA"
+    },
+    "openrouter:default": {
+      "type": "api_key",
+      "provider": "openrouter",
+      "key": "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"
+    },
+    "deepseek:default": {
+      "type": "api_key",
+      "provider": "deepseek",
+      "key": "your_deepseek_api_key_here"
+    },
+    "custom-001:default": {
+      "type": "api_key",
+      "provider": "custom-001",
+      "key": "your_deepseek_api_key_here",
+      "apiUrl": "https://api.deepseek.com/anthropic"
+    },
+    "xiaomi:default": {
+      "type": "api_key",
+      "provider": "xiaomi",
+      "key": "tp-ckdjmv8565pww3d39467l0fg8oclxl5dgtomn4yyam8xz36q"
+    }
+  },
+  "lastGood": {
+    "minimax-portal": "minimax-portal:default",
+    "minimax": "minimax:cn",
+    "openrouter": "openrouter:default",
+    "custom-001": "custom-001:default"
+  },
+  "usageStats": {
+    "minimax-portal:default": {
+      "lastUsed": 1777216646909,
+      "errorCount": 0,
+      "lastFailureAt": 1775138049760
+    },
+    "minimax:cn": {
+      "errorCount": 1,
+      "lastUsed": 1774790535558,
+      "lastFailureAt": 1775138050759,
+      "failureCounts": {
+        "auth": 1
+      },
+      "cooldownUntil": 1775138080759,
+      "cooldownReason": "auth"
+    },
+    "openrouter:default": {
+      "errorCount": 0,
+      "lastUsed": 1774951658420
+    }
+  }
+}

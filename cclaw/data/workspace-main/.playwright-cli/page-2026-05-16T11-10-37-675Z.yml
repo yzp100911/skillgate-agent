@@ -1,0 +1,455 @@
+- generic [active] [ref=e1]:
+  - img:
+    - generic "购买服务-icon@1x"
+    - generic "ic-开票":
+      - generic:
+        - generic:
+          - generic: 开票
+  - generic [ref=e50]:
+    - menubar [ref=e53]:
+      - generic [ref=e54]:
+        - menuitem "工作台 " [expanded] [ref=e56]:
+          - generic [ref=e57] [cursor=pointer]:
+            - img [ref=e58]
+            - text: 工作台
+            - generic [ref=e60]: 
+          - menu [ref=e61]:
+            - link "我的工作" [ref=e62] [cursor=pointer]:
+              - /url: "#/dashboard/index"
+              - menuitem "我的工作" [ref=e63]:
+                - generic [ref=e64]: 我的工作
+            - link "我的数据" [ref=e65] [cursor=pointer]:
+              - /url: "#/dashboard/myData"
+              - menuitem "我的数据" [ref=e66]:
+                - generic [ref=e67]: 我的数据
+        - link "房源" [ref=e68] [cursor=pointer]:
+          - /url: "#/house/index"
+          - menuitem "房源" [ref=e69]:
+            - img [ref=e70]
+            - text: 房源
+        - link "租约" [ref=e72] [cursor=pointer]:
+          - /url: "#/lease/index"
+          - menuitem "租约" [ref=e73]:
+            - img [ref=e74]
+            - text: 租约
+        - menuitem "设备 " [ref=e76]:
+          - generic [ref=e77] [cursor=pointer]:
+            - img [ref=e78]
+            - text: 设备
+            - generic [ref=e80]: 
+        - menuitem "财务 " [ref=e81]:
+          - generic [ref=e82] [cursor=pointer]:
+            - img [ref=e83]
+            - text: 财务
+            - generic [ref=e85]: 
+        - menuitem "报表 " [ref=e86]:
+          - generic [ref=e87] [cursor=pointer]:
+            - img [ref=e88]
+            - text: 报表
+            - generic [ref=e90]: 
+        - menuitem "审核 " [ref=e91]:
+          - generic [ref=e92] [cursor=pointer]:
+            - img [ref=e93]
+            - text: 审核
+            - generic [ref=e95]: 
+        - link "招租" [ref=e96] [cursor=pointer]:
+          - /url: "#/rent/index"
+          - menuitem "招租" [ref=e97]:
+            - img [ref=e98]
+            - text: 招租
+        - link "报修" [ref=e100] [cursor=pointer]:
+          - /url: "#/repair/index"
+          - menuitem "报修" [ref=e101]:
+            - img [ref=e102]
+            - text: 报修
+        - menuitem "开票 " [ref=e104]:
+          - generic [ref=e105] [cursor=pointer]:
+            - img [ref=e106]
+            - text: 开票
+            - generic [ref=e108]: 
+        - menuitem "子账号 " [ref=e109]:
+          - generic [ref=e110] [cursor=pointer]:
+            - img [ref=e111]
+            - text: 子账号
+            - generic [ref=e113]: 
+        - link "帮助" [ref=e114] [cursor=pointer]:
+          - /url: "#/helpCenter/index"
+          - menuitem "帮助" [ref=e115]:
+            - img [ref=e116]
+            - text: 帮助
+        - link "配置" [ref=e118] [cursor=pointer]:
+          - /url: "#/configuration/index"
+          - menuitem "配置" [ref=e119]:
+            - img [ref=e120]
+            - text: 配置
+        - text: 
+    - generic [ref=e122]:
+      - generic [ref=e123]:
+        - menubar [ref=e124]:
+          - img [ref=e126] [cursor=pointer]
+          - navigation "Breadcrumb" [ref=e130]:
+            - link "房源" [ref=e591]
+          - generic [ref=e133]:
+            - button "二维码" [ref=e135] [cursor=pointer]:
+              - generic [ref=e136]:
+                - img [ref=e137]
+                - text: 二维码
+            - button "添加预定" [ref=e139] [cursor=pointer]:
+              - generic [ref=e140]:
+                - img [ref=e141]
+                - text: 添加预定
+            - button "办理入住" [ref=e143] [cursor=pointer]:
+              - generic [ref=e144]:
+                - img [ref=e145]
+                - text: 办理入住
+            - button "群发消息" [ref=e148] [cursor=pointer]:
+              - generic [ref=e149]:
+                - img [ref=e150]
+                - text: 群发消息
+            - generic [ref=e152]:
+              - button "消息通知" [ref=e153] [cursor=pointer]:
+                - generic [ref=e154]:
+                  - img [ref=e155]
+                  - text: 消息通知
+              - superscript [ref=e157]: 99+
+            - button "购买服务" [ref=e159] [cursor=pointer]:
+              - generic [ref=e160]:
+                - img [ref=e161]
+                - text: 购买服务
+            - button "个人中心" [ref=e164] [cursor=pointer]:
+              - img [ref=e165]
+              - text: 个人中心
+        - text:             
+      - generic [ref=e592]:
+        - generic [ref=e593]:
+          - generic [ref=e594]:
+            - generic [ref=e596]:
+              - text: 房源筛选
+              - generic [ref=e597]:
+                - textbox [ref=e599]
+                - generic [ref=e600]:
+                  - textbox "选择/搜索房源" [ref=e601] [cursor=pointer]
+                  - generic [ref=e603] [cursor=pointer]: 
+              - generic [ref=e605]:
+                - textbox "选择按楼层查询" [disabled] [ref=e606]
+                - generic [ref=e608]: 
+              - textbox "搜索（房型/房间/住户名称）" [ref=e610]
+            - generic [ref=e612]:
+              - text: 户型筛选
+              - generic [ref=e613]:
+                - textbox [ref=e615]
+                - generic [ref=e616]:
+                  - textbox "选择按户型查询" [ref=e617] [cursor=pointer]
+                  - generic [ref=e619] [cursor=pointer]: 
+              - text: 面积筛选
+              - generic [ref=e620]:
+                - textbox [ref=e622]
+                - generic [ref=e623]:
+                  - textbox "选择按面积查询" [ref=e624] [cursor=pointer]
+                  - generic [ref=e626] [cursor=pointer]: 
+              - text: 租金筛选
+              - generic [ref=e627]:
+                - textbox [ref=e629]
+                - generic [ref=e630]:
+                  - textbox "选择按租金查询" [ref=e631] [cursor=pointer]
+                  - generic [ref=e633] [cursor=pointer]: 
+              - text: 空置筛选
+              - generic [ref=e634]:
+                - textbox [ref=e636]
+                - generic [ref=e637]:
+                  - textbox "选择按空置天数查询" [ref=e638] [cursor=pointer]
+                  - generic [ref=e640] [cursor=pointer]: 
+              - text: 标签筛选
+              - generic [ref=e641]:
+                - textbox [ref=e643]
+                - generic [ref=e644]:
+                  - textbox "选择按房间标签查询" [ref=e645] [cursor=pointer]
+                  - generic [ref=e647] [cursor=pointer]: 
+          - generic [ref=e648]:
+            - link "导出房态图" [ref=e649] [cursor=pointer]:
+              - /url: https://gezorig.dongguanbank.cn/api/v2/rooms/status/export?label=5&buildingIds=&floors=
+              - generic [ref=e650]:
+                - img [ref=e651]
+                - text: 导出房态图
+            - generic [ref=e652]:
+              - img [ref=e653]
+              - text: 资产总览图
+            - button "批量操作 " [ref=e655] [cursor=pointer]:
+              - text: 批量操作
+              - generic [ref=e656]: 
+        - generic [ref=e659]:
+          - button "全部·61" [ref=e660] [cursor=pointer]:
+            - generic [ref=e661]: 全部·61
+          - button "未出租·8" [ref=e662] [cursor=pointer]:
+            - generic [ref=e663]: 未出租·8
+          - button "已出租·53" [ref=e664] [cursor=pointer]:
+            - generic [ref=e665]: 已出租·53
+          - button "租约即将到期·24" [ref=e666] [cursor=pointer]:
+            - generic [ref=e667]: 租约即将到期·24
+          - button "租约过期·1" [ref=e668] [cursor=pointer]:
+            - generic [ref=e669]: 租约过期·1
+          - button "租约欠款·7" [ref=e670] [cursor=pointer]:
+            - generic [ref=e671]: 租约欠款·7
+          - button "已预定·1" [ref=e672] [cursor=pointer]:
+            - generic [ref=e673]: 已预定·1
+          - button "预定已过期·0" [ref=e674] [cursor=pointer]:
+            - generic [ref=e675]: 预定已过期·0
+          - button "待结算·0" [ref=e676] [cursor=pointer]:
+            - generic [ref=e677]: 待结算·0
+          - button "待审核·0" [ref=e678] [cursor=pointer]:
+            - generic [ref=e679]: 待审核·0
+          - button "占用·0" [ref=e680] [cursor=pointer]:
+            - generic [ref=e681]: 占用·0
+          - button "高级筛选" [ref=e683] [cursor=pointer]:
+            - img [ref=e684]
+            - text: 高级筛选
+        - generic [ref=e686]:
+          - generic:  
+          - generic [ref=e688]:
+            - generic [ref=e689]: 有米公寓（石碣店）
+            - generic [ref=e690]:
+              - link "管理房源" [ref=e691] [cursor=pointer]:
+                - /url: javascript:;
+                - img [ref=e692]
+                - text: 管理房源
+              - link "本栋招租二维码" [ref=e693] [cursor=pointer]:
+                - /url: javascript:;
+                - img [ref=e694]
+                - text: 本栋招租二维码
+          - generic [ref=e697]:
+            - generic [ref=e698]:
+              - heading "1层" [level=4] [ref=e699]
+              - generic [ref=e700]:
+                - link "编辑" [ref=e701] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e702] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e703]:
+              - generic [ref=e704]:
+                - generic [ref=e705]: "101"
+                - generic [ref=e706]:
+                  - generic [ref=e707]:
+                    - generic [ref=e708]: 欠
+                    - generic [ref=e711]: 15天
+                  - generic [ref=e712]:
+                    - generic [ref=e713]: 快
+                    - generic [ref=e716]: 15天
+              - paragraph [ref=e717]: 0m²
+              - generic [ref=e718]:
+                - generic [ref=e719]: ￥1200.00
+                - generic [ref=e720]:
+                  - img [ref=e722]
+                  - generic [ref=e723]: 彭艳阳
+          - generic [ref=e740]:
+            - generic [ref=e741]:
+              - heading "4层" [level=4] [ref=e1697]
+              - generic [ref=e743]:
+                - link "编辑" [ref=e744] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e745] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e746]:
+              - generic [ref=e747]:
+                - generic [ref=e748]: "408"
+                - generic [ref=e749]:
+                  - generic [ref=e1698]:
+                    - generic [ref=e1699]: 欠
+                    - generic [ref=e1702]: 15天
+                  - generic [ref=e1703]:
+                    - generic [ref=e1704]: 快
+                    - generic [ref=e1707]: 16天
+              - paragraph [ref=e750]: 0m²
+              - generic [ref=e751]:
+                - generic [ref=e752]: ￥600.00
+                - generic [ref=e753]:
+                  - generic [ref=e754]:
+                    - img [ref=e755]
+                    - img [ref=e756]
+                  - generic [ref=e757]: 钟光红
+            - generic [ref=e759]:
+              - generic [ref=e760]:
+                - generic [ref=e761]: "410"
+                - generic [ref=e1708]:
+                  - generic [ref=e1709]: 欠
+                  - generic [ref=e1712]: 15天
+              - paragraph [ref=e763]: 0m²
+              - generic [ref=e764]:
+                - generic [ref=e765]: ￥550.00
+                - generic [ref=e766]:
+                  - generic [ref=e767]:
+                    - img [ref=e768]
+                    - img [ref=e769]
+                  - generic [ref=e770]: 王朋
+          - generic [ref=e887]:
+            - generic [ref=e888]:
+              - heading "5层" [level=4] [ref=e1713]
+              - generic [ref=e890]:
+                - link "编辑" [ref=e891] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e892] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e893]:
+              - generic [ref=e894]:
+                - generic [ref=e895]: "505"
+                - generic [ref=e896]:
+                  - generic [ref=e1714]:
+                    - generic [ref=e1715]: 欠
+                    - generic [ref=e1718]: 15天
+                  - generic [ref=e897]:
+                    - generic [ref=e898]: 快
+                    - generic [ref=e901]: 15天
+              - paragraph [ref=e902]: 0m²
+              - generic [ref=e903]:
+                - generic [ref=e904]: ￥530.00
+                - generic [ref=e1719]:
+                  - generic [ref=e1720]:
+                    - img [ref=e1721]
+                    - img [ref=e1722]
+                  - generic [ref=e1723]: 陈艺
+          - generic [ref=e1029]:
+            - generic [ref=e1030]:
+              - heading "6层" [level=4] [ref=e1724]
+              - generic [ref=e1032]:
+                - link "编辑" [ref=e1033] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e1034] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e1035]:
+              - generic [ref=e1036]:
+                - generic [ref=e1037]: "603"
+                - generic [ref=e1038]:
+                  - generic [ref=e1725]:
+                    - generic [ref=e1726]: 欠
+                    - generic [ref=e1729]: 15天
+                  - generic [ref=e1039]:
+                    - generic [ref=e1040]: 快
+                    - generic [ref=e1043]: 15天
+              - paragraph [ref=e1044]: 0m²
+              - generic [ref=e1045]:
+                - generic [ref=e1046]: ￥500.00
+                - generic [ref=e1047]:
+                  - img [ref=e1050]
+                  - generic [ref=e1051]: 黄水富
+            - generic [ref=e1053]:
+              - generic [ref=e1054]:
+                - generic [ref=e1055]: "610"
+                - generic [ref=e1730]:
+                  - generic [ref=e1731]: 欠
+                  - generic [ref=e1734]: 15天
+              - paragraph [ref=e1057]: 0m²
+              - generic [ref=e1058]:
+                - generic [ref=e1059]: ￥600.00
+                - generic [ref=e1060]:
+                  - generic [ref=e1061]:
+                    - img [ref=e1062]
+                    - img [ref=e1063]
+                  - generic [ref=e1064]: 梁峻荣
+          - generic [ref=e1202]:
+            - generic [ref=e1203]:
+              - heading "7层" [level=4] [ref=e1735]
+              - generic [ref=e1205]:
+                - link "编辑" [ref=e1206] [cursor=pointer]:
+                  - /url: javascript:;
+                - link "删除" [ref=e1207] [cursor=pointer]:
+                  - /url: javascript:;
+            - generic [ref=e1208]:
+              - generic [ref=e1209]:
+                - generic [ref=e1210]: "708"
+                - generic [ref=e1211]:
+                  - generic [ref=e1736]:
+                    - generic [ref=e1737]: 欠
+                    - generic [ref=e1740]: 15天
+                  - generic [ref=e1212]:
+                    - generic [ref=e1213]: 快
+                    - generic [ref=e1216]: 15天
+              - paragraph [ref=e1217]: 0m²
+              - generic [ref=e1218]:
+                - generic [ref=e1219]: ￥0.00
+                - generic [ref=e1220]:
+                  - img [ref=e1223]
+                  - generic [ref=e1224]: 员工宿舍
+        - text:                      
+    - generic: 
+  - tooltip "有米公寓（石碣店）-505 编辑操作 房源信息 户型： 1室0厅0卫 房间面积：0m² 租金：530.00元/月 智能家居 房源备注 房间标签 管理方报修 租约信息 租约状态 ： 即将到期 承租人：陈艺 承租人电话：13751101705 租期起止日期：2024/02/01 - 2026/05/31 租约详情 退租 修改租约 续租 换房 历史租约 账单信息 当前租金欠款（总）：530.00 当前水电气等欠款： 0.00 下期付租日期： - 租约账单 添加账单" [ref=e1859]:
+    - generic [ref=e1742]:
+      - generic [ref=e1743]:
+        - generic [ref=e1745]:
+          - generic [ref=e1746]: 有米公寓（石碣店）-505
+          - generic [ref=e1747]: 编辑操作
+        - generic [ref=e1749]:
+          - generic [ref=e1750]:
+            - paragraph [ref=e1751]: 房源信息
+            - paragraph [ref=e1752]: 户型： 1室0厅0卫
+            - paragraph [ref=e1753]: 房间面积：0m²
+            - paragraph [ref=e1754]: 租金：530.00元/月
+            - tablist [ref=e1756]:
+              - 'tab "房源备注:  " [ref=e1758]':
+                - 'button "房源备注:  " [ref=e1759] [cursor=pointer]':
+                  - text: "房源备注:"
+                  - generic [ref=e1760]: 
+                  - generic [ref=e1761]: 
+          - generic [ref=e1762]:
+            - button "智能家居" [ref=e1763] [cursor=pointer]:
+              - generic [ref=e1764]:
+                - img [ref=e1765]
+                - text: 智能家居
+            - button "房源备注" [ref=e1766] [cursor=pointer]:
+              - generic [ref=e1767]:
+                - img [ref=e1768]
+                - text: 房源备注
+            - button "房间标签" [ref=e1769] [cursor=pointer]:
+              - generic [ref=e1770]:
+                - img [ref=e1771]
+                - text: 房间标签
+            - button "管理方报修" [ref=e1772] [cursor=pointer]:
+              - generic [ref=e1773]:
+                - img [ref=e1774]
+                - text: 管理方报修
+        - generic [ref=e1776]:
+          - generic [ref=e1777]:
+            - paragraph [ref=e1778]: 租约信息
+            - paragraph [ref=e1779]: 租约状态 ： 即将到期
+            - paragraph [ref=e1860]: 承租人：陈艺
+            - paragraph [ref=e1861]: 承租人电话：13751101705
+            - paragraph [ref=e1862]: 租期起止日期：2024/02/01 - 2026/05/31
+          - generic [ref=e1784]:
+            - button "租约详情" [ref=e1863] [cursor=pointer]:
+              - generic [ref=e1864]:
+                - img [ref=e1865]
+                - text: 租约详情
+            - button "退租" [ref=e1866] [cursor=pointer]:
+              - generic [ref=e1867]:
+                - img [ref=e1868]
+                - text: 退租
+            - button "修改租约" [ref=e1869] [cursor=pointer]:
+              - generic [ref=e1870]:
+                - img [ref=e1871]
+                - text: 修改租约
+            - button "续租" [ref=e1872] [cursor=pointer]:
+              - generic [ref=e1873]:
+                - img [ref=e1874]
+                - text: 续租
+            - button "换房" [ref=e1875] [cursor=pointer]:
+              - generic [ref=e1876]:
+                - img [ref=e1877]
+                - text: 换房
+            - button "历史租约" [ref=e1800] [cursor=pointer]:
+              - generic [ref=e1801]:
+                - img [ref=e1802]
+                - text: 历史租约
+        - generic [ref=e1804]:
+          - generic [ref=e1805]:
+            - paragraph [ref=e1806]: 账单信息
+            - paragraph [ref=e1807]: 当前租金欠款（总）：530.00
+            - paragraph [ref=e1808]: 当前水电气等欠款： 0.00
+            - paragraph [ref=e1809]: 下期付租日期： -
+          - generic [ref=e1810]:
+            - button "租约账单" [ref=e1811] [cursor=pointer]:
+              - generic [ref=e1812]:
+                - img [ref=e1813]
+                - text: 租约账单
+            - button "添加账单" [ref=e1814] [cursor=pointer]:
+              - generic [ref=e1815]:
+                - img [ref=e1816]
+                - text: 添加账单
+      - text: 

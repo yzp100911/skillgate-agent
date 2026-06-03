@@ -58,10 +58,16 @@ export function getModel() {
 /** 根据当前模型获取对应的 API 配置（Key + 地址） */
 export function getApiConfig() {
   const model = getModel();
-  if (model === 'deepseek-v4-flash') {
+  if (model === 'deepseek-v4-flash[1M]') {
     return {
       apiKey: cfg.DEEPSEEK_API_KEY,
       baseURL: cfg.DEEPSEEK_BASE_URL,
+    };
+  }
+  if (model === 'mimo-v2.5-pro[1M]') {
+    return {
+      apiKey: cfg.MIMO_API_KEY,
+      baseURL: cfg.MIMO_BASE_URL,
     };
   }
   return {
@@ -78,6 +84,10 @@ export const config = {
   deepseek: {
     apiKey: cfg.DEEPSEEK_API_KEY,
     baseURL: cfg.DEEPSEEK_BASE_URL,
+  },
+  mimo: {
+    apiKey: cfg.MIMO_API_KEY,
+    baseURL: cfg.MIMO_BASE_URL,
   },
   get model() { return runtime.model; },
   memory: {

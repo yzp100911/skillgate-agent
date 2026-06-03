@@ -1,0 +1,451 @@
+- generic [active] [ref=e1]:
+  - img:
+    - generic "购买服务-icon@1x"
+    - generic "ic-开票":
+      - generic:
+        - generic:
+          - generic: 开票
+  - generic [ref=e53]:
+    - menubar [ref=e56]:
+      - generic [ref=e57]:
+        - menuitem "工作台 " [expanded] [ref=e59]:
+          - generic [ref=e60] [cursor=pointer]:
+            - img [ref=e61]
+            - text: 工作台
+            - generic [ref=e63]: 
+          - menu [ref=e64]:
+            - link "我的工作" [ref=e65] [cursor=pointer]:
+              - /url: "#/dashboard/index"
+              - menuitem "我的工作" [ref=e66]:
+                - generic [ref=e67]: 我的工作
+            - link "我的数据" [ref=e68] [cursor=pointer]:
+              - /url: "#/dashboard/myData"
+              - menuitem "我的数据" [ref=e69]:
+                - generic [ref=e70]: 我的数据
+        - link "房源" [ref=e71] [cursor=pointer]:
+          - /url: "#/house/index"
+          - menuitem "房源" [ref=e72]:
+            - img [ref=e73]
+            - text: 房源
+        - link "租约" [ref=e75] [cursor=pointer]:
+          - /url: "#/lease/index"
+          - menuitem "租约" [ref=e76]:
+            - img [ref=e77]
+            - text: 租约
+        - menuitem "设备 " [ref=e79]:
+          - generic [ref=e80] [cursor=pointer]:
+            - img [ref=e81]
+            - text: 设备
+            - generic [ref=e83]: 
+        - menuitem "财务 " [ref=e84]:
+          - generic [ref=e85] [cursor=pointer]:
+            - img [ref=e86]
+            - text: 财务
+            - generic [ref=e88]: 
+        - menuitem "报表 " [ref=e89]:
+          - generic [ref=e90] [cursor=pointer]:
+            - img [ref=e91]
+            - text: 报表
+            - generic [ref=e93]: 
+        - menuitem "审核 " [ref=e94]:
+          - generic [ref=e95] [cursor=pointer]:
+            - img [ref=e96]
+            - text: 审核
+            - generic [ref=e98]: 
+        - link "招租" [ref=e99] [cursor=pointer]:
+          - /url: "#/rent/index"
+          - menuitem "招租" [ref=e100]:
+            - img [ref=e101]
+            - text: 招租
+        - link "报修" [ref=e103] [cursor=pointer]:
+          - /url: "#/repair/index"
+          - menuitem "报修" [ref=e104]:
+            - img [ref=e105]
+            - text: 报修
+        - menuitem "开票 " [ref=e107]:
+          - generic [ref=e108] [cursor=pointer]:
+            - img [ref=e109]
+            - text: 开票
+            - generic [ref=e111]: 
+        - menuitem "子账号 " [ref=e112]:
+          - generic [ref=e113] [cursor=pointer]:
+            - img [ref=e114]
+            - text: 子账号
+            - generic [ref=e116]: 
+        - link "帮助" [ref=e117] [cursor=pointer]:
+          - /url: "#/helpCenter/index"
+          - menuitem "帮助" [ref=e118]:
+            - img [ref=e119]
+            - text: 帮助
+        - link "配置" [ref=e121] [cursor=pointer]:
+          - /url: "#/configuration/index"
+          - menuitem "配置" [ref=e122]:
+            - img [ref=e123]
+            - text: 配置
+        - text: 
+    - generic [ref=e125]:
+      - generic [ref=e126]:
+        - menubar [ref=e127]:
+          - img [ref=e129] [cursor=pointer]
+          - navigation "Breadcrumb" [ref=e133]:
+            - link "我的工作" [ref=e135]
+          - generic [ref=e136]:
+            - button "二维码" [ref=e138] [cursor=pointer]:
+              - generic [ref=e139]:
+                - img [ref=e140]
+                - text: 二维码
+            - button "添加预定" [ref=e142] [cursor=pointer]:
+              - generic [ref=e143]:
+                - img [ref=e144]
+                - text: 添加预定
+            - button "办理入住" [ref=e146] [cursor=pointer]:
+              - generic [ref=e147]:
+                - img [ref=e148]
+                - text: 办理入住
+            - button "群发消息" [ref=e151] [cursor=pointer]:
+              - generic [ref=e152]:
+                - img [ref=e153]
+                - text: 群发消息
+            - generic [ref=e155]:
+              - button "消息通知" [ref=e156] [cursor=pointer]:
+                - generic [ref=e157]:
+                  - img [ref=e158]
+                  - text: 消息通知
+              - superscript [ref=e160]: 99+
+            - button "购买服务" [ref=e162] [cursor=pointer]:
+              - generic [ref=e163]:
+                - img [ref=e164]
+                - text: 购买服务
+            - button "个人中心" [ref=e167] [cursor=pointer]:
+              - img [ref=e168]
+              - text: 个人中心
+        - text:             
+      - generic [ref=e170]:
+        - generic [ref=e171]:
+          - generic [ref=e172]:
+            - generic [ref=e173]:
+              - generic [ref=e174]:
+                - generic [ref=e175]:
+                  - generic [ref=e176]:
+                    - img [ref=e177]
+                    - generic [ref=e179]: 待办事项
+                  - generic [ref=e182]:
+                    - generic [ref=e184] [cursor=pointer]:
+                      - generic [ref=e185]: 报修消息：有米公寓（南城沙苑市场）-306租客（文微枫）已经...
+                      - generic [ref=e186]: 【3条未读】
+                    - generic [ref=e188] [cursor=pointer]:
+                      - generic [ref=e189]: 租约消息：有米公寓（南城沙苑市场）-431(陈磊)已确认合约...
+                      - generic [ref=e190]: 【426条未读】
+                    - generic [ref=e192] [cursor=pointer]:
+                      - generic [ref=e193]: 审核消息：有米公寓（南城沙苑市场）463房谭仕豪退租审核已通...
+                      - generic [ref=e194]: 【770条未读】
+                    - generic [ref=e196] [cursor=pointer]:
+                      - generic [ref=e197]: 通知消息：杨依淋预定了有米公寓（南城沙苑市场）-329，成功...
+                      - generic [ref=e198]: 【30条未读】
+                    - generic [ref=e200] [cursor=pointer]:
+                      - generic [ref=e201]: 账单消息：有米公寓（南城沙苑市场）-467(梁贵博)成功支付...
+                      - generic [ref=e202]: 【2583条未读】
+                - generic [ref=e204]:
+                  - generic [ref=e206]:
+                    - generic [ref=e207]: 财务
+                    - generic [ref=e208]:
+                      - generic [ref=e210]:
+                        - generic [ref=e211]: "43"
+                        - generic [ref=e212]: 应收待收(笔)
+                      - generic [ref=e214]:
+                        - generic [ref=e215]: "39"
+                        - generic [ref=e216]: 应收逾期(笔)
+                      - generic [ref=e218]:
+                        - generic [ref=e219]: "3"
+                        - generic [ref=e220]: 未来7天应收(笔)
+                      - generic [ref=e222]:
+                        - generic [ref=e223]: "3.26"
+                        - generic [ref=e224]: 未来30天预期待收(万)
+                      - generic [ref=e226]:
+                        - generic [ref=e227]: "3.72"
+                        - generic [ref=e228]: 未来30天预期待退(万)
+                  - generic [ref=e230]:
+                    - generic [ref=e231]: 房源
+                    - generic [ref=e232]:
+                      - generic [ref=e234]:
+                        - generic [ref=e235]: "2"
+                        - generic [ref=e236]: 预定待处理(个)
+                      - generic [ref=e238]:
+                        - generic [ref=e239]: "47"
+                        - generic [ref=e240]: 租约即将到期(个)
+                      - generic [ref=e242]:
+                        - generic [ref=e243]: "0"
+                        - generic [ref=e244]: 租约已经过期(个)
+                      - generic [ref=e246]:
+                        - generic [ref=e247]: "0"
+                        - generic [ref=e248]: 退租待结算(个)
+                      - generic [ref=e250]:
+                        - generic [ref=e251]: "0"
+                        - generic [ref=e252]: 报修待处理(个)
+              - generic [ref=e253]:
+                - generic [ref=e254]:
+                  - generic [ref=e255]:
+                    - generic [ref=e257]:
+                      - img [ref=e258]
+                      - generic [ref=e260]: 房源概况
+                    - generic [ref=e262]:
+                      - generic [ref=e263]:
+                        - img [ref=e264]
+                        - generic [ref=e265]:
+                          - generic [ref=e266]: 楼栋数量
+                          - generic [ref=e267] [cursor=pointer]: "1"
+                      - generic [ref=e268]:
+                        - img [ref=e269]
+                        - generic [ref=e270]:
+                          - generic [ref=e271]: 房间数量
+                          - generic [ref=e272] [cursor=pointer]: "137"
+                      - generic [ref=e273]:
+                        - img [ref=e274]
+                        - generic [ref=e275]:
+                          - generic [ref=e276]: 总面积
+                          - generic [ref=e277]: 0m²
+                  - generic [ref=e278]:
+                    - generic [ref=e280]:
+                      - img [ref=e281]
+                      - generic [ref=e283]: 入住概况
+                      - generic [ref=e284]: 
+                    - generic [ref=e290]:
+                      - radiogroup [ref=e292]:
+                        - radio "按房间数" [checked] [ref=e293] [cursor=pointer]:
+                          - radio [checked] [ref=e296]
+                          - generic [ref=e297]: 按房间数
+                        - radio "按面积" [ref=e298] [cursor=pointer]:
+                          - radio [ref=e301]
+                          - generic [ref=e302]: 按面积
+                      - generic [ref=e303]:
+                        - generic [ref=e304]:
+                          - generic [ref=e305]: 已出租房间
+                          - generic [ref=e306] [cursor=pointer]: "94"
+                        - generic [ref=e307]:
+                          - generic [ref=e308]: 未出租房间
+                          - generic [ref=e309] [cursor=pointer]: "43"
+                - generic [ref=e310]:
+                  - generic [ref=e312]:
+                    - img [ref=e313]
+                    - generic [ref=e315]: 签约概况
+                  - generic [ref=e317]:
+                    - table [ref=e319]:
+                      - rowgroup [ref=e325]:
+                        - row "日/月/年 新签 退/换房 续签" [ref=e326]:
+                          - columnheader "日/月/年" [ref=e327]:
+                            - generic [ref=e328]: 日/月/年
+                          - columnheader "新签" [ref=e329]:
+                            - generic [ref=e330]: 新签
+                          - columnheader "退/换房" [ref=e331]:
+                            - generic [ref=e332]: 退/换房
+                          - columnheader "续签" [ref=e333]:
+                            - generic [ref=e334]: 续签
+                    - table [ref=e338]:
+                      - rowgroup [ref=e344]:
+                        - row "今日 1 0 0" [ref=e345]:
+                          - cell "今日" [ref=e346]:
+                            - generic [ref=e347]: 今日
+                          - cell "1" [ref=e348]:
+                            - generic [ref=e350] [cursor=pointer]: "1"
+                          - cell "0" [ref=e351]:
+                            - generic [ref=e353] [cursor=pointer]: "0"
+                          - cell "0" [ref=e354]:
+                            - generic [ref=e356] [cursor=pointer]: "0"
+                        - row "昨日 1 1 0" [ref=e357]:
+                          - cell "昨日" [ref=e358]:
+                            - generic [ref=e359]: 昨日
+                          - cell "1" [ref=e360]:
+                            - generic [ref=e362] [cursor=pointer]: "1"
+                          - cell "1" [ref=e363]:
+                            - generic [ref=e365] [cursor=pointer]: "1"
+                          - cell "0" [ref=e366]:
+                            - generic [ref=e368] [cursor=pointer]: "0"
+                        - row "本月 11 6 2" [ref=e369]:
+                          - cell "本月" [ref=e370]:
+                            - generic [ref=e371]: 本月
+                          - cell "11" [ref=e372]:
+                            - generic [ref=e374] [cursor=pointer]: "11"
+                          - cell "6" [ref=e375]:
+                            - generic [ref=e377] [cursor=pointer]: "6"
+                          - cell "2" [ref=e378]:
+                            - generic [ref=e380] [cursor=pointer]: "2"
+                        - row "上月同期 3 6 2" [ref=e381]:
+                          - cell "上月同期" [ref=e382]:
+                            - generic [ref=e383]: 上月同期
+                          - cell "3" [ref=e384]:
+                            - generic [ref=e386] [cursor=pointer]: "3"
+                          - cell "6" [ref=e387]:
+                            - generic [ref=e389] [cursor=pointer]: "6"
+                          - cell "2" [ref=e390]:
+                            - generic [ref=e392] [cursor=pointer]: "2"
+                        - row "今年 70 68 74" [ref=e393]:
+                          - cell "今年" [ref=e394]:
+                            - generic [ref=e395]: 今年
+                          - cell "70" [ref=e396]:
+                            - generic [ref=e398] [cursor=pointer]: "70"
+                          - cell "68" [ref=e399]:
+                            - generic [ref=e401] [cursor=pointer]: "68"
+                          - cell "74" [ref=e402]:
+                            - generic [ref=e404] [cursor=pointer]: "74"
+                        - row "去年同期 116 84 56" [ref=e405]:
+                          - cell "去年同期" [ref=e406]:
+                            - generic [ref=e407]: 去年同期
+                          - cell "116" [ref=e408]:
+                            - generic [ref=e410] [cursor=pointer]: "116"
+                          - cell "84" [ref=e411]:
+                            - generic [ref=e413] [cursor=pointer]: "84"
+                          - cell "56" [ref=e414]:
+                            - generic [ref=e416] [cursor=pointer]: "56"
+              - generic [ref=e418]:
+                - generic [ref=e420]:
+                  - img [ref=e421]
+                  - generic [ref=e423]: 设备报警
+                - generic [ref=e425]:
+                  - generic [ref=e426]:
+                    - generic [ref=e427]:
+                      - text: 水
+                      - text: 表
+                    - generic [ref=e428]:
+                      - generic [ref=e429]:
+                        - generic [ref=e430] [cursor=pointer]: "0"
+                        - generic [ref=e431]: 冷水表关阀数量
+                      - generic [ref=e432]:
+                        - generic [ref=e433] [cursor=pointer]: "0"
+                        - generic [ref=e434]: 热水表关阀数量
+                      - generic [ref=e435]:
+                        - generic [ref=e436] [cursor=pointer]: "0"
+                        - generic [ref=e437]: 水表离线报警
+                      - generic [ref=e438]:
+                        - generic [ref=e439] [cursor=pointer]: "0"
+                        - generic [ref=e440]: 水表异常报警
+                  - generic [ref=e441]:
+                    - generic [ref=e442]:
+                      - text: 电
+                      - text: 表
+                    - generic [ref=e443]:
+                      - generic [ref=e444]:
+                        - generic [ref=e445] [cursor=pointer]: "0"
+                        - generic [ref=e446]: 电表断电数量
+                      - generic [ref=e447]:
+                        - generic [ref=e448] [cursor=pointer]: "0"
+                        - generic [ref=e449]: 电表断电报警
+                      - generic [ref=e450]:
+                        - generic [ref=e451] [cursor=pointer]: "0"
+                        - generic [ref=e452]: 电表离线报警
+                      - generic [ref=e453]:
+                        - generic [ref=e454] [cursor=pointer]: "0"
+                        - generic [ref=e455]: 电表异常报警
+                  - generic [ref=e456]:
+                    - generic [ref=e457]:
+                      - text: 门
+                      - text: 锁
+                    - generic [ref=e458]:
+                      - generic [ref=e459]:
+                        - generic [ref=e460] [cursor=pointer]: "0"
+                        - generic [ref=e461]: 门锁低电量报警
+                      - generic [ref=e462]:
+                        - generic [ref=e463] [cursor=pointer]: "0"
+                        - generic [ref=e464]: 门锁离线报警
+                      - generic [ref=e465]:
+                        - generic [ref=e466] [cursor=pointer]: "0"
+                        - generic [ref=e467]: 门锁异常报警
+                  - generic [ref=e468]:
+                    - generic [ref=e469]:
+                      - text: 门
+                      - text: 禁
+                    - generic [ref=e471]:
+                      - generic [ref=e472] [cursor=pointer]: "0"
+                      - generic [ref=e473]: 门禁离线报警
+            - generic [ref=e474]:
+              - generic [ref=e477]:  
+              - generic [ref=e478]:
+                - generic [ref=e479]:
+                  - generic [ref=e480]:
+                    - img [ref=e481]
+                    - generic [ref=e483]: 公告栏
+                  - generic [ref=e484]:
+                    - link "更多 >" [ref=e485] [cursor=pointer]:
+                      - /url: "#/announcement/myAnnouncement"
+                    - generic [ref=e486] [cursor=pointer]:
+                      - img [ref=e487]
+                      - text: 发布
+                - generic [ref=e489]:
+                  - generic [ref=e490] [cursor=pointer]:
+                    - generic [ref=e492]: 平台公告
+                    - generic [ref=e494]: 【提前发单】特殊节假日提前发单小技巧
+                    - generic [ref=e495]: 2024-02-01 17:19:07
+                  - generic [ref=e496] [cursor=pointer]:
+                    - generic [ref=e498]: 平台公告
+                    - generic [ref=e500]: 参与莞e租满意度调查，送好礼！
+                    - generic [ref=e501]: 2021-06-18 16:43:16
+                  - generic [ref=e502] [cursor=pointer]:
+                    - generic [ref=e504]: 平台公告
+                    - generic [ref=e506]: 莞e租交租有礼活动，房东租客人人有份！
+                    - generic [ref=e507]: 2021-03-11 20:30:25
+              - text: 
+              - generic [ref=e508]:
+                - generic [ref=e510]:
+                  - img [ref=e511]
+                  - generic [ref=e513]: 本月收支
+                  - generic [ref=e514]: 
+                - generic [ref=e517]:
+                  - generic [ref=e518]:
+                    - generic [ref=e519]: 收入
+                    - generic [ref=e520] [cursor=pointer]: 48,783.77
+                  - generic [ref=e521]:
+                    - generic [ref=e522]: 支出
+                    - generic [ref=e523] [cursor=pointer]: 4,565.81
+                  - generic [ref=e524]:
+                    - generic [ref=e525]: 结余
+                    - generic [ref=e526] [cursor=pointer]: 44,217.96
+              - generic [ref=e530]:
+                - generic [ref=e532]:
+                  - img [ref=e533]
+                  - generic [ref=e535]: 本月应收
+                  - generic [ref=e536]: 
+                - generic [ref=e539]:
+                  - generic [ref=e540]:
+                    - generic [ref=e541]: 应收
+                    - generic [ref=e542] [cursor=pointer]: 76,292.90
+                  - generic [ref=e543]:
+                    - generic [ref=e544]: 应收已收
+                    - generic [ref=e545] [cursor=pointer]: 47,982.79
+                  - generic [ref=e546]:
+                    - generic [ref=e547]: 应收待收
+                    - generic [ref=e548] [cursor=pointer]: 28,310.11
+                  - generic [ref=e549]:
+                    - generic [ref=e550]: 应收待收(逾期)
+                    - generic [ref=e551] [cursor=pointer]: 25,149.27
+              - generic [ref=e555]:
+                - generic [ref=e557]:
+                  - img [ref=e558]
+                  - generic [ref=e560]: 智能设备
+                - generic [ref=e562]:
+                  - generic [ref=e563]:
+                    - generic [ref=e564]:
+                      - img [ref=e565]
+                      - generic [ref=e567]: 智能冷水表
+                    - generic [ref=e568] [cursor=pointer]: "0"
+                  - generic [ref=e569]:
+                    - generic [ref=e570]:
+                      - img [ref=e571]
+                      - generic [ref=e573]: 智能热水表
+                    - generic [ref=e574] [cursor=pointer]: "0"
+                  - generic [ref=e575]:
+                    - generic [ref=e576]:
+                      - img [ref=e577]
+                      - generic [ref=e579]: 智能电表
+                    - generic [ref=e580] [cursor=pointer]: "0"
+                  - generic [ref=e581]:
+                    - generic [ref=e582]:
+                      - img [ref=e583]
+                      - generic [ref=e585]: 智能门锁
+                    - generic [ref=e586] [cursor=pointer]: "0"
+                  - generic [ref=e587]:
+                    - generic [ref=e588]:
+                      - img [ref=e589]
+                      - generic [ref=e591]: 智能门禁
+                    - generic [ref=e592] [cursor=pointer]: "0"
+          - generic:   
+        - generic:  
+    - generic: 

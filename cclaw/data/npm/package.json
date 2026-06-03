@@ -1,0 +1,22 @@
+{
+  "private": true,
+  "dependencies": {
+    "@tencent-weixin/openclaw-weixin": "2.4.3"
+  },
+  "overrides": {
+    "@aws-sdk/client-bedrock-runtime": "3.1042.0",
+    "axios": "1.16.0",
+    "follow-redirects": "1.16.0",
+    "node-domexception": "npm:@nolyfill/domexception@1.0.28",
+    "uuid": "14.0.0"
+  },
+  "openclaw": {
+    "managedOverrides": [
+      "@aws-sdk/client-bedrock-runtime",
+      "axios",
+      "follow-redirects",
+      "node-domexception",
+      "uuid"
+    ]
+  }
+}

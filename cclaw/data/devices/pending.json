@@ -1,0 +1,20 @@
+{
+  "0c2b6fe8-347c-45cf-af52-705c357184a4": {
+    "requestId": "0c2b6fe8-347c-45cf-af52-705c357184a4",
+    "deviceId": "1e6bb7e44b104e10a0ccbe58fcc34e666d7bcec370e3928652f87d8fdb651ff8",
+    "publicKey": "kDyHqpOpWzv382IozITKjkxxJ1pEePRbjIxydcd5cl4",
+    "platform": "linux",
+    "clientId": "cli",
+    "clientMode": "cli",
+    "role": "operator",
+    "roles": [
+      "operator"
+    ],
+    "scopes": [
+      "operator.pairing"
+    ],
+    "silent": false,
+    "isRepair": true,
+    "ts": 1778394713851
+  }
+}

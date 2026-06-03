@@ -3,7 +3,7 @@
 // Windows SSL 证书兼容（仅本地工具使用）
 process.env.NODE_TLS_REJECT_UNAUTHORIZED ||= '0';
 
-import { config } from './src/config.js';
+import { config, getApiConfig } from './src/config.js';
 import { SkillManager } from './src/skill-manager.js';
 import { setSkillManager, setMemoryStore, setMCPManager, addMcpTools, setQuotaTracker } from './src/tools.js';
 import { hooks } from './src/hooks/registry.js';
@@ -27,7 +27,7 @@ if (!config.minimax.apiKey || config.minimax.apiKey === 'your_api_key_here') {
 
 console.log(`  🦀 xCrab v2.0.0`);
 console.log(`  模型: ${config.model}`);
-console.log(`  API: ${config.minimax.baseURL}`);
+console.log(`  API: ${getApiConfig().baseURL}`);
 if (config.memory.enabled) console.log('  记忆: 已启用');
 if (config.mcp.servers.length > 0) console.log(`  MCP: ${config.mcp.servers.length} 个服务器`);
 console.log();

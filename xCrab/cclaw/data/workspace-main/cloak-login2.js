@@ -30,7 +30,7 @@ import { launch } from '/www/server/nodejs/v22.22.2/lib/node_modules/cloakbrowse
     await page.locator('input[placeholder*="手机"]').fill('18926879306');
     console.log('✅ 已填写账号');
     
-    await page.locator('input[placeholder*="密码"]').fill('100911yzpYZP');
+    await page.locator('input[placeholder*="密码"]').fill('your_password_here');
     console.log('✅ 已填写密码');
     
     await page.waitForTimeout(500);

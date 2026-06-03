@@ -213,6 +213,26 @@ export const toolDefinitions = [
   {
     type: 'function',
     function: {
+      name: 'forget',
+      description: '删除一条或多条记忆。当用户要求忘记某些信息、或你发现记忆过时/错误时使用。支持按 key 精确删除或按 query 搜索后删除。',
+      parameters: {
+        type: 'object',
+        properties: {
+          key: {
+            type: 'string',
+            description: '要删除的记忆 key（精确匹配），与 query 二选一',
+          },
+          query: {
+            type: 'string',
+            description: '搜索关键词，将删除匹配到的所有记忆，与 key 二选一',
+          },
+        },
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
       name: 'create_plan',
       description: '将复杂任务自动拆解为多个子步骤并按序执行。当用户请求涉及多步操作（如查天气+算数、搜索+分析）时使用此工具。',
       parameters: {
@@ -590,6 +610,31 @@ function recall(args) {
   ).join('\n');
 }
 
+function forget(args) {
+  if (!_memoryStore) return '记忆系统未启用（ENABLE_MEMORY=false）';
+
+  if (args.key) {
+    if (!_memoryStore.exists(args.key)) return `未找到 key 为 "${args.key}" 的记忆。`;
+    _memoryStore.remove(args.key);
+    return `已删除记忆: ${args.key}`;
+  }
+
+  if (args.query) {
+    const results = _memoryStore.search(args.query);
+    if (results.length === 0) return `未找到与 "${args.query}" 相关的记忆。`;
+    const toDelete = results.slice(0, 10);
+    const deleted = [];
+    for (const r of toDelete) {
+      _memoryStore.remove(r.key);
+      deleted.push(r.key);
+    }
+    const suffix = results.length > 10 ? `（仅删除前 10 条，共匹配 ${results.length} 条）` : '';
+    return `已删除 ${deleted.length} 条记忆: ${deleted.join(', ')}${suffix}`;
+  }
+
+  return '请提供 key 或 query 参数来指定要删除的记忆。';
+}
+
 async function runCommand(args) {
   const { exec } = await import('node:child_process');
   const { promisify } = await import('node:util');
@@ -873,6 +918,7 @@ const handlers = {
   run_command: runCommand,
   remember,
   recall,
+  forget,
   create_plan: createPlan,
   configure_skill: configureSkill,
   render_canvas: renderCanvas,

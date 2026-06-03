@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "runs": {
+    "ec3c1d8e-d0d8-4510-877c-56ff2a7944c8": {
+      "runId": "ec3c1d8e-d0d8-4510-877c-56ff2a7944c8",
+      "childSessionKey": "agent:main:subagent:2167455e-92c7-4e9b-9e5d-3c8c982409f5",
+      "controllerSessionKey": "agent:main:explicit:session_1778834864975",
+      "requesterSessionKey": "agent:main:explicit:session_1778834864975",
+      "requesterDisplayKey": "agent:main:explicit:session_1778834864975",
+      "task": "Use the openclaw message send command to send \"你好\" to 18926879306 via the openclaw-weixin channel. The account ID is ed9fdc2495f0-im-bot.",
+      "cleanup": "keep",
+      "expectsCompletionMessage": true,
+      "spawnMode": "run",
+      "model": "minimax/MiniMax-M2.7",
+      "agentDir": "/opt/cclaw-client/UbuntuClaw/cclaw/data/agents/main/agent",
+      "workspaceDir": "/opt/cclaw-client/UbuntuClaw/cclaw/data/workspace-main",
+      "runTimeoutSeconds": 0,
+      "createdAt": 1778836662707,
+      "startedAt": 1778836664551,
+      "sessionStartedAt": 1778836662707,
+      "accumulatedRuntimeMs": 0,
+      "cleanupHandled": true,
+      "completionAnnouncedAt": 1778836699981,
+      "retainAttachmentsOnKeep": false,
+      "endedAt": 1778836678806,
+      "outcome": {
+        "status": "ok",
+        "startedAt": 1778836664551,
+        "endedAt": 1778836678806,
+        "elapsedMs": 14255
+      },
+      "endedReason": "subagent-complete",
+      "frozenResultText": "The WeChat (openclaw-weixin) plugin doesn't accept phone numbers as targets — it requires a WeChat ID (wxid_...). \n\n**Result:** Failed — \"Unknown target\" for 18926879306. The WeChat channel needs a wxid-style identifier, not an E.164 phone number.\n\n姚泽平 (your human) would need to either:\n1. Provide the WeChat wxid for 18926879306\n2. Or confirm if this contact has an associated wxid in the OpenClaw WeChat plugin directory",
+      "frozenResultCapturedAt": 1778836679252,
+      "endedHookEmittedAt": 1778836700118,
+      "cleanupCompletedAt": 1778836700123
+    }
+  }
+}

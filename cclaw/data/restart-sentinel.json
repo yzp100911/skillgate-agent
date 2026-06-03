@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "payload": {
+    "kind": "restart",
+    "status": "ok",
+    "ts": 1778888603457,
+    "sessionKey": "agent:main:explicit:session_1778885841448",
+    "message": "应用 cron schema 变更：允许 payload.kind=\"none\" 和 delivery.summary 字段，支持 webhook-only 不触发 AI 的定时任务。",
+    "continuation": {
+      "kind": "agentTurn",
+      "message": "The gateway restart completed successfully. Tell the user OpenClaw restarted successfully and continue any pending work."
+    },
+    "doctorHint": "Run: openclaw doctor --non-interactive",
+    "stats": {
+      "mode": "gateway.restart"
+    }
+  }
+}

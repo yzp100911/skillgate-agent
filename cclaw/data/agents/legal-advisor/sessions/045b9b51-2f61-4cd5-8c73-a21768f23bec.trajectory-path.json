@@ -1,0 +1,6 @@
+{
+  "traceSchema": "openclaw-trajectory-pointer",
+  "schemaVersion": 1,
+  "sessionId": "045b9b51-2f61-4cd5-8c73-a21768f23bec",
+  "runtimeFile": "/opt/cclaw-client/UbuntuClaw/cclaw/data/agents/legal-advisor/sessions/045b9b51-2f61-4cd5-8c73-a21768f23bec.trajectory.jsonl"
+}

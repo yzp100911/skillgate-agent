@@ -10,10 +10,10 @@ export async function callLLM(messages, tools) {
   const apiConfig = getApiConfig();
   const url = `${apiConfig.baseURL}/chat/completions`;
   const model = getModel();
-  const maxTokens = model === 'deepseek-v4-flash' ? 393216 : 196608;
+  const maxTokens = model.startsWith('deepseek-v4-flash') ? 393216 : model.startsWith('mimo-v2.5-pro') ? 131072 : 196608;
 
   const body = {
-    model,
+    model: model.replace('[1M]', ''),
     messages,
     temperature: 0.7,
     max_tokens: maxTokens,

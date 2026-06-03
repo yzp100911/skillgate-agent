@@ -397,7 +397,7 @@ async function fetchCurrentModel() {
     if (data.code === 200) {
       const badge = document.getElementById('current-model-badge');
       if (badge) {
-        const displayMap = { 'deepseek-v4-flash': 'DS', 'MiniMax-M2.7': 'MM' };
+        const displayMap = { 'deepseek-v4-flash[1M]': 'DS', 'MiniMax-M2.7': 'MM', 'mimo-v2.5-pro[1M]': 'MIMO' };
         badge.textContent = displayMap[data.data.name] || data.data.name;
       }
       // 高亮当前模型按钮
@@ -419,7 +419,7 @@ function closeSwitchModel() {
 async function executeSwitchModel(model) {
   closeSwitchModel();
 
-  const modelName = model === 'deepseek' ? 'deepseek-v4-flash' : 'MiniMax-M2.7';
+  const modelName = model === 'deepseek' ? 'deepseek-v4-flash[1M]' : model === 'mimo' ? 'mimo-v2.5-pro[1M]' : 'MiniMax-M2.7';
   const token = getToken();
   if (!token) {
     showToast('error', '请先设置访问令牌');

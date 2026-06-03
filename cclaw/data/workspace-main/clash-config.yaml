@@ -1,0 +1,175 @@
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+dns:
+  enable: true
+  listen: 0.0.0.0:53
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/15
+  nameserver:
+  - 8.8.8.8
+  - 1.1.1.1
+  fallback:
+  - 8.8.4.4
+  - 1.0.0.1
+proxies:
+- name: HK-香港2-直连
+  type: vless
+  server: iiei.rk57.q24b.a.rros.cc
+  port: 15361
+  uuid: ca167082-7677-47d1-a920-5cdb69733f31
+  flow: xtls-rprx-vision
+  network: tcp
+  sni: www.speedtest.net
+  fp: safari
+  servername: www.speedtest.net
+  spx: /
+  reality: true
+- name: HK-香港1-直连
+  type: vless
+  server: i2xd.bukp.32r8.a.rros.cc
+  port: 10291
+  uuid: ca167082-7677-47d1-a920-5cdb69733f31
+  flow: xtls-rprx-vision
+  network: tcp
+  sni: www.speedtest.net
+  fp: chrome
+  servername: www.speedtest.net
+  spx: /
+  reality: true
+- name: HK-香港3-直连
+  type: hysteria2
+  server: r8h8.3m7a.t4hy.a.rros.cc
+  port: 25251
+  password: ca167082-7677-47d1-a920-5cdb69733f31
+  obfs: salamander
+  obfs-password: aMz0jmqT7YiBbh7y
+  insecure: false
+- name: TW-台湾2-直连
+  type: hysteria2
+  server: tez5.7h6g.d632.a.rros.cc
+  port: 36372
+  password: ca167082-7677-47d1-a920-5cdb69733f31
+  obfs: salamander
+  obfs-password: Wm7bGKy5l3NXgA2i
+  sni: tez5.7h6g.d632.a.vvps.xyz
+  insecure: false
+- name: sg-新加坡2-直连
+  type: hysteria2
+  server: sg02.kozmsl-szims.top
+  port: 11085
+  password: ca167082-7677-47d1-a920-5cdb69733f31
+  obfs: salamander
+  obfs-password: JwCW6JzQZCFsvvEe
+  insecure: false
+- name: US-美国1-直连
+  type: hysteria2
+  server: us02.iskbdis.com
+  port: 11085
+  password: ca167082-7677-47d1-a920-5cdb69733f31
+  obfs: salamander
+  obfs-password: cEW7GclYahWJM2FR
+  insecure: false
+- name: US-美国2-直连
+  type: hysteria2
+  server: us03.kozmsl-szims.top
+  port: 11085
+  password: ca167082-7677-47d1-a920-5cdb69733f31
+  obfs: salamander
+  obfs-password: 8jiVpZrikIclC3UD
+  insecure: false
+proxy-groups:
+- name: 🚀 节点选择
+  type: url-test
+  proxies:
+  - HK-香港2-直连
+  - HK-香港1-直连
+  - HK-香港3-直连
+  - TW-台湾2-直连
+  - sg-新加坡2-直连
+  - US-美国1-直连
+  - US-美国2-直连
+  url: http://www.gstatic.com/generate_204
+  interval: 300
+  tolerance: 50
+- name: ♻️ 自动切换
+  type: fallback
+  proxies:
+  - HK-香港2-直连
+  - HK-香港1-直连
+  - HK-香港3-直连
+  - TW-台湾2-直连
+  - sg-新加坡2-直连
+  - US-美国1-直连
+  - US-美国2-直连
+  url: http://www.gstatic.com/generate_204
+  interval: 300
+- name: 🌍 国外媒体
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - ♻️ 自动切换
+  - HK-香港2-直连
+  - HK-香港1-直连
+  - HK-香港3-直连
+  - TW-台湾2-直连
+  - sg-新加坡2-直连
+  - US-美国1-直连
+  - US-美国2-直连
+- name: 📺 奈飞
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - HK-香港2-直连
+  - HK-香港1-直连
+  - HK-香港3-直连
+  - TW-台湾2-直连
+  - sg-新加坡2-直连
+  - US-美国1-直连
+  - US-美国2-直连
+- name: 📡 电报代理
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - HK-香港2-直连
+  - HK-香港1-直连
+  - HK-香港3-直连
+  - TW-台湾2-直连
+  - sg-新加坡2-直连
+  - US-美国1-直连
+  - US-美国2-直连
+- name: 🍎 苹果服务
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - HK-香港2-直连
+  - HK-香港1-直连
+  - HK-香港3-直连
+  - TW-台湾2-直连
+  - sg-新加坡2-直连
+  - US-美国1-直连
+  - US-美国2-直连
+- name: 🐟 漏网之鱼
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - HK-香港2-直连
+  - HK-香港1-直连
+  - HK-香港3-直连
+  - TW-台湾2-直连
+  - sg-新加坡2-直连
+  - US-美国1-直连
+  - US-美国2-直连
+rules:
+- DOMAIN-SUFFIX,baidu.com,DIRECT
+- DOMAIN-SUFFIX,qq.com,DIRECT
+- DOMAIN-SUFFIX,tencent.com,DIRECT
+- DOMAIN-SUFFIX,google.com,🚀 节点选择
+- DOMAIN-SUFFIX,youtube.com,🚀 节点选择
+- DOMAIN-SUFFIX,netflix.com,🚀 节点选择
+- DOMAIN-SUFFIX,telegram.org,🚀 节点选择
+- DOMAIN-KEYWORD,telegram,🚀 节点选择
+- DOMAIN-SUFFIX,apple.com,🚀 节点选择
+- DOMAIN-SUFFIX,googleapis.com,🚀 节点选择
+- MATCH,🚀 节点选择

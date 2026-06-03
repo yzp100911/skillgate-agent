@@ -40,11 +40,6 @@ export class GatewayServer {
     app.use(cors());
     app.use(express.json());
 
-    // 健康检查端点
-    app.get('/health', (req, res) => {
-      res.json({ status: 'ok', timestamp: new Date().toISOString() });
-    });
-
     // 静态文件服务（前端 + 图标）
     app.use(express.static(FRONTEND_DIR));
     app.use('/ico', express.static(path.resolve(__dirname, '..', 'ico')));

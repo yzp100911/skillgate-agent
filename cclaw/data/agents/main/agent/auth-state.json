@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "lastGood": {
+    "minimax-portal": "minimax-portal:default",
+    "minimax": "minimax:cn",
+    "openrouter": "openrouter:default",
+    "custom-001": "custom-001:default"
+  },
+  "usageStats": {
+    "minimax-portal:default": {
+      "errorCount": 1,
+      "lastUsed": 1778589176377,
+      "failureCounts": {
+        "model_not_found": 1
+      },
+      "lastFailureAt": 1779271837313,
+      "cooldownUntil": 1779271867313,
+      "cooldownReason": "model_not_found"
+    },
+    "minimax:cn": {
+      "errorCount": 0,
+      "lastUsed": 1779271902605
+    },
+    "openrouter:default": {
+      "errorCount": 0,
+      "lastUsed": 1774951658420
+    },
+    "custom-001:default": {
+      "errorCount": 0,
+      "lastUsed": 1779163804755
+    },
+    "deepseek:default": {
+      "errorCount": 0,
+      "lastUsed": 1778927266486
+    },
+    "xiaomi:default": {
+      "errorCount": 1,
+      "failureCounts": {
+        "auth": 1
+      },
+      "lastFailureAt": 1778590196190,
+      "cooldownUntil": 1778590226190,
+      "cooldownReason": "auth"
+    }
+  }
+}

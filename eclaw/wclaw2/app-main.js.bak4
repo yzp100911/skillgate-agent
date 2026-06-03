@@ -1,0 +1,2118 @@
+    let currentBackend = localStorage.getItem('wclaw_backend') || 'openclaw';
+
+    if (currentToken && currentUser) {
+        showApp();
+        updateTTSButton();
+        updateNotifyButton();
+    }
+    let sidebarHidden = false;
+
+    function updateHeaderBackend() {
+        const label = currentBackend === 'hermes' ? 'Hermes' : 'OpenClaw';
+        // 更新头部标题
+        const headerLabel = document.getElementById('header-backend-label');
+        if (headerLabel) headerLabel.textContent = label;
+        // 更新头部机器人图标
+        const headerIcon = document.getElementById('header-icon');
+        if (headerIcon) {
+            headerIcon.src = currentBackend === 'hermes' ? 'icon/Hermes.png' : 'icon/openclaw.png';
+        }
+        // 更新输入框旁的切换按钮
+        const agentLabel = document.querySelector('.btn-toggle-agent .agent-label');
+        if (agentLabel) agentLabel.textContent = label;
+        const agentIndicator = document.querySelector('.btn-toggle-agent .agent-indicator');
+        if (agentIndicator) {
+            agentIndicator.className = 'agent-indicator ' + currentBackend;
+        }
+        // 更新下拉菜单里的切换按钮
+        const toggleLabel = document.querySelector('.toggle-agent-label');
+        if (toggleLabel) toggleLabel.textContent = ' ' + label;
+        const dropdownIcon = document.getElementById('dropdown-icon');
+        if (dropdownIcon) {
+            dropdownIcon.src = currentBackend === 'hermes' ? 'icon/Hermes.png' : 'icon/openclaw.png';
+        }
+    }
+
+    // 获取并显示当前大模型
+    async function fetchCurrentModel() {
+        if (!currentToken) return;
+        try {
+            const res = await fetch(host + '/api/current_model', {
+                headers: { 'Authorization': 'Bearer ' + currentToken }
+            });
+            const data = await res.json();
+            if (data.code === 200) {
+                const badge = document.getElementById('current-model-badge');
+                if (badge) {
+                    const displayMap = { 'deepseek-v4-flash': 'DS', 'MiniMax-M2.7': 'MM' };
+                    badge.textContent = displayMap[data.data.name] || data.data.name;
+                }
+            }
+        } catch (e) {
+            console.error('获取当前模型失败:', e);
+        }
+    }
+    if (document.readyState === 'complete') {
+        updateHeaderBackend();
+    } else {
+        window.addEventListener('load', updateHeaderBackend);
+    }
+
+    function toggleBackend() {
+        // 检查当前会话是否正在执行任务
+        const sessionState = getSessionState(currentSessionId);
+        const isThisSessionRemote =
+            currentSessionId in remoteExecutingSessions &&
+            remoteExecutingSessions[currentSessionId] &&
+            remoteExecutingSessions[currentSessionId].since;
+        if (sessionState.isExecuting || !!isThisSessionRemote) {
+            showToast('warning', '当前会话正在执行任务，请等待完成后再切换平台');
+            return;
+        }
+
+        currentBackend = (currentBackend === 'openclaw') ? 'hermes' : 'openclaw';
+        localStorage.setItem('wclaw_backend', currentBackend);
+        // 保存到当前会话
+        const curSession = sessions.find(s => s.id === currentSessionId);
+        if (curSession) {
+            curSession.backend = currentBackend;
+            saveSessions();
+        }
+        updateHeaderBackend();
+        showToast('info', '已切换到 ' + (currentBackend === 'hermes' ? 'Hermes Agent' : 'OpenClaw'));
+    }
+
+    // 移动端消息操作按钮下拉菜单切换
+    function toggleMsgActions(btn) {
+        const dropdown = btn.nextElementSibling;
+        if (!dropdown) return;
+
+        // 关闭其他已打开的下拉菜单时同步清理遮罩
+        document.querySelectorAll('.msg-actions-dropdown.open').forEach(d => {
+            if (d !== dropdown) {
+                d.classList.remove('open');
+            }
+        });
+        document.querySelectorAll('.msg-actions-backdrop').forEach(el => el.remove());
+
+        if (dropdown.classList.contains('open')) {
+            dropdown.classList.remove('open');
+        } else {
+            dropdown.classList.add('open');
+            // 添加半透明遮罩
+            const backdrop = document.createElement('div');
+            backdrop.className = 'msg-actions-backdrop';
+            backdrop.addEventListener('click', function() {
+                dropdown.classList.remove('open');
+                document.body.removeChild(backdrop);
+            });
+            document.body.appendChild(backdrop);
+        }
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (window.innerWidth > 768) {
+            sidebar.classList.toggle('hidden');
+        } else {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+    }
+
+    function closeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+    }
+
+    function toggleSidebarDesktop() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleIcon = document.getElementById('sidebar-toggle-icon');
+        
+        sidebarHidden = !sidebarHidden;
+        
+        if (sidebarHidden) {
+            sidebar.classList.add('hidden');
+            toggleIcon.classList.remove('fa-chevron-left');
+            toggleIcon.classList.add('fa-chevron-right');
+        } else {
+            sidebar.classList.remove('hidden');
+            toggleIcon.classList.remove('fa-chevron-right');
+            toggleIcon.classList.add('fa-chevron-left');
+        }
+    }
+
+    function loadSessions() {
+        if (!currentUser) return;
+        const sessionsKey = 'wclaw_sessions_' + currentUser;
+        sessions = JSON.parse(localStorage.getItem(sessionsKey) || '[]');
+        
+        // Migration: check if old history exists
+        const oldHistoryKey = 'wclaw_history_' + currentUser;
+        const oldHistory = localStorage.getItem(oldHistoryKey);
+        if (oldHistory && sessions.length === 0) {
+            const defaultSessionId = 'session_default';
+            sessions.push({
+                id: defaultSessionId,
+                title: '默认对话',
+                timestamp: Date.now()
+            });
+            localStorage.setItem('wclaw_history_' + currentUser + '_' + defaultSessionId, oldHistory);
+            localStorage.removeItem(oldHistoryKey);
+        }
+        
+        if (sessions.length === 0) {
+            createNewSession(true);
+        } else {
+            currentSessionId = localStorage.getItem('wclaw_current_session_' + currentUser) || sessions[0].id;
+            if (!sessions.find(s => s.id === currentSessionId)) {
+                currentSessionId = sessions[0].id;
+            }
+            // 恢复当前会话的平台
+            const curSession = sessions.find(s => s.id === currentSessionId);
+            if (curSession && curSession.backend) {
+                currentBackend = curSession.backend;
+                localStorage.setItem('wclaw_backend', currentBackend);
+                updateHeaderBackend();
+            }
+            renderSessionList();
+            loadHistory();
+            // 根据当前会话的状态设置发送按钮
+            updateSendBtnBySessionState();
+        }
+    }
+
+    function saveSessions() {
+        if (!currentUser) return;
+        const key = 'wclaw_sessions_' + currentUser;
+        localStorage.setItem(key, JSON.stringify(sessions));
+        localStorage.setItem('wclaw_current_session_' + currentUser, currentSessionId);
+    }
+
+    // 通知服务器和 cclaw 有新会话
+    async function notifyNewSession(sessionId, title) {
+        if (!currentToken) return;
+        try {
+            await fetch(host + '/api/new_session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + currentToken
+                },
+                body: JSON.stringify({ sessionId, title })
+            });
+        } catch (e) {
+            console.error('通知服务器新会话失败:', e);
+        }
+    }
+
+    function createNewSession(render = true) {
+        const newSession = {
+            id: 'session_' + Date.now(),
+            title: '新对话',
+            timestamp: Date.now(),
+            backend: currentBackend
+        };
+        sessions.unshift(newSession);
+        currentSessionId = newSession.id;
+
+        // 初始化新会话的执行状态
+        const sessionState = getSessionState(currentSessionId);
+        sessionState.isExecuting = false;
+        sessionState.msgId = null;
+
+        saveSessions();
+        if (render) {
+            renderSessionList();
+            loadHistory();
+            // 根据新会话的状态设置发送按钮
+            updateSendBtnBySessionState();
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        }
+
+        // 主动通知服务器和 cclaw 有新会话，提前建立 session 上下文
+        notifyNewSession(newSession.id, newSession.title);
+    }
+
+    function switchSession(id) {
+        if (id === currentSessionId) return;
+
+        const oldSessionId = currentSessionId;
+
+        // 保持旧会话的SSE连接，消息会根据sessionId正确路由
+        // 不关闭SSE连接，让AI回复继续接收
+
+        // 保存当前平台到旧会话
+        const oldSession = sessions.find(s => s.id === oldSessionId);
+        if (oldSession) {
+            oldSession.backend = currentBackend;
+        }
+
+        // 切换会话
+        currentSessionId = id;
+
+        // 恢复新会话的平台
+        const newSession = sessions.find(s => s.id === id);
+        if (newSession && newSession.backend) {
+            currentBackend = newSession.backend;
+            localStorage.setItem('wclaw_backend', currentBackend);
+            updateHeaderBackend();
+        }
+
+        saveSessions();
+        renderSessionList();
+        loadHistory();
+
+        // 根据新会话的状态设置按钮和状态栏
+        updateSendBtnBySessionState();
+
+        // 如果是移动端，关闭侧边栏
+        if (window.innerWidth <= 768) {
+            closeSidebar();
+        }
+    }
+
+    function deleteSession(event, id) {
+        event.stopPropagation();
+        if (!confirm('确定删除此对话吗？')) return;
+        
+        sessions = sessions.filter(s => s.id !== id);
+        localStorage.removeItem('wclaw_history_' + currentUser + '_' + id);
+        
+        if (sessions.length === 0) {
+            createNewSession(true);
+            return;
+        } else if (currentSessionId === id) {
+            currentSessionId = sessions[0].id;
+        }
+        saveSessions();
+        renderSessionList();
+        loadHistory();
+        // 根据当前会话的状态设置发送按钮
+        updateSendBtnBySessionState();
+    }
+
+    function renderSessionList() {
+        const listEl = document.getElementById('session-list');
+        listEl.innerHTML = sessions.map(s => `
+            <div class="session-item ${s.id === currentSessionId ? 'active' : ''}" onclick="onSessionItemClick('${s.id}', event)">
+                <input type="checkbox" class="session-batch-checkbox" value="${s.id}" onchange="updateSessionBatchCount()" ${isSessionBatchMode ? '' : 'style="display:none"'}>
+                <i class="fa-regular fa-message"></i>
+                <div class="session-title">${escapeHtml(s.title)}</div>
+                <i class="fa-solid fa-xmark btn-delete-session" onclick="deleteSession(event, '${s.id}')" title="删除"></i>
+            </div>
+        `).join('');
+    }
+
+    function onSessionItemClick(id, event) {
+        if (isSessionBatchMode) {
+            // 如果直接点的是勾选框，让它自己处理，不重复翻转
+            if (event.target && event.target.classList.contains('session-batch-checkbox')) {
+                return;
+            }
+            const cb = event.currentTarget.querySelector('.session-batch-checkbox');
+            if (cb) {
+                cb.checked = !cb.checked;
+                updateSessionBatchCount();
+            }
+            return;
+        }
+        switchSession(id);
+    }
+
+    function startExecutionTimer(sessionId) {
+        const statusBar = document.getElementById('status-bar');
+        let timerEl = document.getElementById('status-timer');
+        const sessionState = getSessionState(sessionId);
+
+        console.log('[startExecutionTimer] 被调用，sessionId:', sessionId, 'currentSessionId:', currentSessionId);
+
+        // 清理该会话之前的计时器
+        if (sessionState.executionTimer) {
+            clearInterval(sessionState.executionTimer);
+            sessionState.executionTimer = null;
+        }
+
+        sessionState.executionSeconds = 0;
+        sessionState.executionStartTime = Date.now(); // 记录开始时间
+
+        // 只有当目标会话是当前活动会话时才显示状态栏和重置计时器显示
+        if (sessionId === currentSessionId) {
+            if (statusBar) {
+                const statusTextEl = statusBar.querySelector('.status-text');
+                if (statusTextEl) {
+                    statusTextEl.innerHTML = `正在执行任务... <span id="status-timer">00:00</span>`;
+                    // innerHTML 重新创建了 span，重新获取引用
+                    timerEl = document.getElementById('status-timer');
+                }
+                statusBar.style.display = 'flex';
+            }
+        }
+
+        // 使用基于时间戳的方式更新计时器，解决后台暂停问题
+        function updateTimer() {
+            if (!sessionState.executionStartTime) return;
+
+            // 计算经过的秒数（基于实际时间差，即使在后台也能正确计算）
+            const elapsed = Math.floor((Date.now() - sessionState.executionStartTime) / 1000);
+            sessionState.executionSeconds = elapsed;
+
+            const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+            const s = String(elapsed % 60).padStart(2, '0');
+            // 只在目标会话是当前活动会话时才更新显示
+            if (sessionId === currentSessionId && timerEl) {
+                timerEl.innerText = `${m}:${s}`;
+            }
+        }
+
+        // 立即执行一次更新
+        updateTimer();
+
+        // 每100ms更新一次计时器（使用时间戳计算，即使后台暂停也能恢复正确时间）
+        sessionState.executionTimer = setInterval(updateTimer, 100);
+    }
+    
+    function stopExecutionTimer(sessionId) {
+        const statusBar = document.getElementById('status-bar');
+        const timerEl = document.getElementById('status-timer');
+        const sessionState = getSessionState(sessionId);
+
+        console.log('[stopExecutionTimer] 被调用，sessionId:', sessionId, 'currentSessionId:', currentSessionId);
+
+        if (sessionState.executionTimer) {
+            clearInterval(sessionState.executionTimer);
+            sessionState.executionTimer = null;
+        }
+
+        sessionState.executionStartTime = null; // 清除开始时间
+
+        // 只有当目标会话是当前活动会话，且远程也没有在执行时，才隐藏状态栏
+        if (sessionId === currentSessionId && !(currentSessionId in remoteExecutingSessions)) {
+            if (statusBar) statusBar.style.display = 'none';
+            if (timerEl) timerEl.innerText = '00:00';
+        }
+    }
+
+    async function stopCommand() {
+        const sessionState = getSessionState(currentSessionId);
+        // 标记为用户主动停止，防止 SSE onerror 覆盖停止消息
+        sessionState.stoppedByUser = true;
+
+        if (sessionState.eventSource) {
+            sessionState.eventSource.close();
+            sessionState.eventSource = null;
+        }
+        if (sessionState.reconnectTimer) {
+            clearTimeout(sessionState.reconnectTimer);
+            sessionState.reconnectTimer = null;
+        }
+        sessionState.reconnectAttempts = 0;
+        resetSendBtn();
+        
+        if (sessionState.msgId) {
+            // msgId 可能不带 reply- 前缀（startSSE 覆盖导致），确保正确查找
+            const replyId = sessionState.msgId.startsWith('reply-') ? sessionState.msgId : 'reply-' + sessionState.msgId;
+            const actualId = sessionState.msgId.startsWith('reply-') ? sessionState.msgId.replace('reply-', '') : sessionState.msgId;
+            let replyEl = document.getElementById(replyId);
+            if (replyEl) {
+                let currentText = replyEl.innerText.replace(/执行中\.*$/, '').replace(/等待接收端响应\.*$/, '').trim();
+                if (currentText) {
+                    updateHistoryResult(actualId, { stdout: currentText + '\n\n[已手动停止]' });
+                } else {
+                    updateHistoryError(actualId, '[已手动停止]');
+                }
+            }
+            sessionState.msgId = null;
+        }
+
+        try {
+            await fetch(host + '/api/stop', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + currentToken }
+            });
+            showAlert('success', '已发送停止指令');
+        } catch(e) {
+            showAlert('error', '停止失败');
+        }
+
+        // 标记此会话为用户主动停止，防止远程轮询重新添加
+        window._userStoppedSession = currentSessionId;
+
+        // 清理当前会话的远程执行状态，立即恢复 UI
+        if (currentSessionId in remoteExecutingSessions) {
+            delete remoteExecutingSessions[currentSessionId];
+        }
+        // 更新标题栏指示器
+        const statusEl = document.getElementById('remote-exec-status');
+        if (statusEl) {
+            statusEl.className = 'remote-status-idle';
+            statusEl.innerHTML = '⚚️ 空闲';
+        }
+        // 强制恢复按钮和状态栏
+        resetSendBtn();
+    }
+
+    async function addFavorite(iconEl, msgId, encodedText) {
+        const text = decodeURIComponent(encodedText);
+        try {
+            const res = await fetch(host + '/api/favorites/toggle', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + currentToken
+                },
+                body: JSON.stringify({ msg_id: msgId, content: text })
+            });
+            const data = await res.json();
+            if (data.code === 200) {
+                if (data.data.action === 'added') {
+                    iconEl.classList.add('active');
+                    iconEl.style.color = '#FF9500';
+                } else {
+                    iconEl.classList.remove('active');
+                    iconEl.style.color = '';
+                }
+            } else {
+                showAlert('error', data.message || '操作失败');
+            }
+        } catch(e) {
+            showAlert('error', '网络错误');
+        }
+    }
+
+    async function openFavorites() {
+        try {
+            const res = await fetch(host + '/api/favorites', {
+                headers: { 'Authorization': 'Bearer ' + currentToken }
+            });
+            const data = await res.json();
+            if (data.code === 200) {
+                const listEl = document.getElementById('favorites-list');
+                if (data.data.length === 0) {
+                    listEl.innerHTML = '<div style="color:var(--text-sub);text-align:center;padding:20px;">暂无收藏</div>';
+                } else {
+                    listEl.innerHTML = data.data.map(item => `
+                        <div class="favorite-item" id="fav-item-${item.msg_id}">
+                            <div class="favorite-time">
+                                <span>${new Date(item.created_at).toLocaleString('zh-CN')}</span>
+                                <i class="fa-solid fa-trash btn-unfav" title="取消收藏" onclick="removeFavorite('${item.msg_id}')"></i>
+                            </div>
+                            <div>${renderMessageContent(item.content)}</div>
+                        </div>
+                    `).join('');
+                }
+                document.getElementById('favorites-modal').style.display = 'flex';
+            }
+        } catch (e) {
+            showAlert('error', '获取收藏失败');
+        }
+    }
+
+    async function removeFavorite(msgId) {
+        if (!confirm('确定要取消收藏吗？')) return;
+        try {
+            const res = await fetch(host + '/api/favorites/toggle', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + currentToken
+                },
+                body: JSON.stringify({ msg_id: msgId, content: '' }) // 内容可为空，后台根据 msg_id 删除
+            });
+            const data = await res.json();
+            if (data.code === 200) {
+                const el = document.getElementById(`fav-item-${msgId}`);
+                if (el) el.remove();
+                
+                // 同步取消主界面上的高亮星号
+                const starIcon = document.getElementById(`star-${msgId}`);
+                if (starIcon) {
+                    starIcon.classList.remove('active');
+                    starIcon.style.color = '';
+                }
+                
+                // 检查是否空了
+                const listEl = document.getElementById('favorites-list');
+                if (listEl.children.length === 0) {
+                    listEl.innerHTML = '<div style="color:var(--text-sub);text-align:center;padding:20px;">暂无收藏</div>';
+                }
+            } else {
+                showAlert('error', data.message || '取消失败');
+            }
+        } catch(e) {
+            showAlert('error', '网络错误');
+        }
+    }
+
+    function copyText(iconEl, encodedText) {
+        let text = decodeURIComponent(encodedText);
+        try {
+            const obj = JSON.parse(text);
+            if (obj.type === 'image' || obj.type === 'file') {
+                let copyContent = '';
+                if (obj.text) {
+                    copyContent = obj.text + '\n\n';
+                }
+                copyContent += host + obj.url;
+                text = copyContent;
+            }
+        } catch(e) {}
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                const oldClass = iconEl.className;
+                iconEl.className = 'fa-solid fa-check';
+                iconEl.style.color = '#34C759';
+                setTimeout(() => {
+                    iconEl.className = oldClass;
+                    iconEl.style.color = '';
+                }, 2000);
+            }).catch(err => {
+                showAlert('error', '复制失败');
+            });
+        } else {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                const oldClass = iconEl.className;
+                iconEl.className = 'fa-solid fa-check';
+                iconEl.style.color = '#34C759';
+                setTimeout(() => {
+                    iconEl.className = oldClass;
+                    iconEl.style.color = '';
+                }, 2000);
+            } catch (err) {
+                showAlert('error', '复制失败');
+            }
+            document.body.removeChild(textArea);
+        }
+    }
+
+    // 分享功能
+    function shareMessage(iconEl, encodedText) {
+        let text = decodeURIComponent(encodedText);
+        try {
+            const obj = JSON.parse(text);
+            if (obj.type === 'image' || obj.type === 'file') {
+                text = host + obj.url;
+            }
+        } catch(e) {}
+
+        // 优先使用Android原生分享接口
+        if (window.AndroidShare && window.AndroidShare.shareText) {
+            window.AndroidShare.shareText('分享AI回复', text);
+        } else if (navigator.share) {
+            // fallback: 使用原生分享API（网页端）
+            navigator.share({
+                title: '分享AI回复',
+                text: text
+            }).catch(err => {
+                console.error('分享失败:', err);
+            });
+        } else {
+            // 最后fallback: 使用mailto分享
+            const subject = encodeURIComponent('分享AI回复');
+            const body = encodeURIComponent(text);
+            const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+            window.location.href = mailtoLink;
+        }
+    }
+
+    // 选中文本后确认复制功能
+    let selectionTimeout = null;
+    let lastSelectedText = '';
+    
+    document.addEventListener('selectionchange', function() {
+        const selection = window.getSelection();
+        const selectedText = selection ? selection.toString().trim() : '';
+
+        // 清除之前的定时器
+        if (selectionTimeout) {
+            clearTimeout(selectionTimeout);
+        }
+
+        // 如果有选中的文本且长度合理
+        if (selectedText.length > 0 && selectedText.length <= 500) {
+            lastSelectedText = selectedText;
+            // 1000ms后显示确认复制提示
+            selectionTimeout = setTimeout(function() {
+                // 显示自定义复制确认弹窗（避免使用 confirm() 导致丢失用户手势）
+                const displayText = selectedText.length > 100 ? selectedText.substring(0, 100) + '...' : selectedText;
+                document.getElementById('copy-preview').innerText = '"' + displayText + '"';
+                document.getElementById('copy-modal').style.display = 'flex';
+                // 存储待复制文本
+                document.getElementById('copy-modal').dataset.text = selectedText;
+            }, 1000);
+        }
+    });
+
+    // 复制弹窗：取消
+    function closeCopyModal() {
+        document.getElementById('copy-modal').style.display = 'none';
+    }
+
+    // 复制弹窗：确认复制
+    function confirmCopy() {
+        const text = document.getElementById('copy-modal').dataset.text;
+        document.getElementById('copy-modal').style.display = 'none';
+        if (!text) return;
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                showAlert('success', '复制成功！');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                showAlert('error', '复制失败');
+            });
+        } else {
+            // fallback方法
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showAlert('success', '复制成功！');
+            } catch (err) {
+                console.error('复制失败:', err);
+                showAlert('error', '复制失败');
+            }
+            document.body.removeChild(textArea);
+        }
+    }
+
+    // 选中文本后引用
+    function quoteSelectedText() {
+        const text = document.getElementById('copy-modal').dataset.text;
+        document.getElementById('copy-modal').style.display = 'none';
+        if (!text) return;
+
+        // 清除已有的引用指示器
+        const existingIndicator = document.querySelector('.quote-indicator');
+        if (existingIndicator) {
+            existingIndicator.remove();
+        }
+
+        quotedMessage = { msgId: 'selected-' + Date.now(), content: text, role: 'user' };
+
+        const quoteLabel = '引用文本';
+        const quoteIndicator = document.createElement('div');
+        quoteIndicator.className = 'quote-indicator';
+        quoteIndicator.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 6px; flex: 1; overflow: hidden;">
+                <span class="quote-label">${quoteLabel}:</span>
+                <span class="quote-content">${escapeHtml(text.substring(0, 100))}${text.length > 100 ? '...' : ''}</span>
+            </div>
+            <i class="fa-solid fa-xmark btn-close-quote" title="清除引用" onclick="clearQuote()"></i>
+        `;
+
+        const inputArea = document.querySelector('.input-area');
+        inputArea.insertBefore(quoteIndicator, inputArea.firstChild);
+
+        document.getElementById('command').focus();
+    }
+
+    let quotedMessage = null;
+
+    function clearQuote() {
+        quotedMessage = null;
+        const existingIndicator = document.querySelector('.quote-indicator');
+        if (existingIndicator) {
+            existingIndicator.remove();
+        }
+    }
+
+    function quoteMessage(msgId, encodedContent, role) {
+        let content = decodeURIComponent(encodedContent);
+        try {
+            const obj = JSON.parse(content);
+            if (obj.type === 'image') {
+                content = '[图片] ' + obj.name;
+            } else if (obj.type === 'file') {
+                content = '[文件] ' + obj.name + (obj.text ? ' - ' + obj.text : '');
+            }
+        } catch(e) {}
+        
+        const inputBox = document.getElementById('command');
+        
+        if (quotedMessage && quotedMessage.msgId === msgId) {
+            clearQuote();
+            inputBox.focus();
+            return;
+        }
+        
+        quotedMessage = { msgId, content, role };
+        
+        const existingIndicator = document.querySelector('.quote-indicator');
+        if (existingIndicator) {
+            existingIndicator.remove();
+        }
+        
+        const quoteLabel = role === 'user' ? '引用自己' : '引用 AI';
+        const quoteIndicator = document.createElement('div');
+        quoteIndicator.className = 'quote-indicator';
+        quoteIndicator.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 6px; flex: 1; overflow: hidden;">
+                <span class="quote-label">${quoteLabel}:</span>
+                <span class="quote-content">${escapeHtml(content.substring(0, 100))}${content.length > 100 ? '...' : ''}</span>
+            </div>
+            <i class="fa-solid fa-xmark btn-close-quote" title="清除引用" onclick="clearQuote()"></i>
+        `;
+        
+        const inputArea = document.querySelector('.input-area');
+        inputArea.insertBefore(quoteIndicator, inputArea.firstChild);
+        
+        inputBox.focus();
+    }
+
+    async function submitFeedback() {
+        const text = document.getElementById('feedback-text').value.trim();
+        if (!text) return showAlert('error', '请输入反馈内容');
+        
+        try {
+            const res = await fetch(host + '/api/feedback', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + currentToken
+                },
+                body: JSON.stringify({ content: text })
+            });
+            const data = await res.json();
+            if (data.code === 200) {
+                showAlert('success', '反馈提交成功，感谢您的建议！');
+                document.getElementById('feedback-modal').style.display = 'none';
+                document.getElementById('feedback-text').value = '';
+            } else {
+                showAlert('error', data.message || '提交失败');
+            }
+        } catch (e) {
+            showAlert('error', '网络错误，请稍后再试');
+        }
+    }
+
+    // 全局变量用于存储待发送的文件
+    let pendingFile = null;
+
+    async function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        // 文件大小限制判断（前端初步校验）
+        const isImage = file.type.startsWith('image/');
+        const maxSize = isImage ? 10 * 1024 * 1024 : 50 * 1024 * 1024;
+        if (file.size > maxSize) {
+            showAlert('error', isImage ? '图片大小不能超过10MB' : '文件大小不能超过50MB');
+            event.target.value = '';
+            return;
+        }
+
+        // 保存待发送的文件
+        pendingFile = file;
+        
+        // 在输入框上方显示文件预览
+        let previewArea = document.getElementById('file-preview-area');
+        if (!previewArea) {
+            previewArea = document.createElement('div');
+            previewArea.id = 'file-preview-area';
+            previewArea.style.cssText = 'padding: 8px 16px; background: var(--bg); border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap;';
+            const inputArea = document.querySelector('.input-area');
+            inputArea.parentNode.insertBefore(previewArea, inputArea);
+        }
+        
+        const isImg = file.type.startsWith('image/');
+        let previewHtml = '';
+        if (isImg) {
+            const url = URL.createObjectURL(file);
+            previewHtml = `<div style="position: relative; display: inline-block;">
+                <img src="${url}" style="height: 60px; border-radius: 6px; border: 1px solid var(--border);">
+                <i class="fa-solid fa-circle-xmark" style="position: absolute; top: -6px; right: -6px; color: var(--danger); cursor: pointer; background: white; border-radius: 50%;" onclick="clearPendingFile()"></i>
+            </div>`;
+        } else {
+            previewHtml = `<div style="position: relative; display: inline-flex; align-items: center; gap: 6px; background: var(--card-bg); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px;">
+                <i class="fa-solid fa-file-lines"></i>
+                <span style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(file.name)}</span>
+                <i class="fa-solid fa-circle-xmark" style="position: absolute; top: -6px; right: -6px; color: var(--danger); cursor: pointer; background: white; border-radius: 50%;" onclick="clearPendingFile()"></i>
+            </div>`;
+        }
+        
+        previewArea.innerHTML = previewHtml;
+        event.target.value = ''; // 重置 input 方便下次选同一个文件
+        
+        // 自动聚焦输入框
+        document.getElementById('command').focus();
+    }
+
+    function clearPendingFile() {
+        pendingFile = null;
+        const previewArea = document.getElementById('file-preview-area');
+        if (previewArea) {
+            previewArea.remove();
+        }
+    }
+
+    function saveToLocalHistory(msg, sessionId) {
+        const targetSessionId = sessionId || currentSessionId;
+        if (!currentUser || !targetSessionId) return;
+        const key = 'wclaw_history_' + currentUser + '_' + targetSessionId;
+        let history = JSON.parse(localStorage.getItem(key) || '[]');
+        // 防止重复：如果同 id 的消息已存在，则不再次添加
+        if (msg.id && history.some(m => m.id === msg.id)) return;
+        history.push(msg);
+        // Keep last 100 messages to prevent storage overflow
+        if (history.length > 100) history = history.slice(history.length - 100);
+        localStorage.setItem(key, JSON.stringify(history));
+
+        // 如果是存入当前会话，才更新会话标题和侧边栏
+        if (targetSessionId === currentSessionId) {
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (session && session.title === '新对话' && msg.role === 'user') {
+                let contentStr = msg.content;
+                try {
+                    const obj = JSON.parse(contentStr);
+                    if (obj.type === 'image' || obj.type === 'file') {
+                        session.title = `[文件] ${obj.name}`;
+                    } else {
+                        session.title = contentStr.substring(0, 15) + (contentStr.length > 15 ? '...' : '');
+                    }
+                } catch(e) {
+                    session.title = contentStr.substring(0, 15) + (contentStr.length > 15 ? '...' : '');
+                }
+                saveSessions();
+                renderSessionList();
+            }
+        }
+    }
+
+    function updateLocalHistory(msgId, updates) {
+        if (!currentUser || !currentSessionId) return;
+        const key = 'wclaw_history_' + currentUser + '_' + currentSessionId;
+        let history = JSON.parse(localStorage.getItem(key) || '[]');
+        const idx = history.findIndex(m => m.id === msgId);
+        if (idx > -1) {
+            history[idx] = { ...history[idx], ...updates };
+            localStorage.setItem(key, JSON.stringify(history));
+        }
+    }
+
+    function removeLocalHistory(msgIds) {
+        if (!currentUser || !currentSessionId) return;
+        const key = 'wclaw_history_' + currentUser + '_' + currentSessionId;
+        let history = JSON.parse(localStorage.getItem(key) || '[]');
+        history = history.filter(m => !msgIds.includes(m.id));
+        localStorage.setItem(key, JSON.stringify(history));
+    }
+
+    function clearLocalHistory() {
+        if (!currentUser || !currentSessionId) return;
+        localStorage.removeItem('wclaw_history_' + currentUser + '_' + currentSessionId);
+    }
+
+    async function loadHistory() {
+        if (!currentUser || !currentSessionId) return;
+        const key = 'wclaw_history_' + currentUser + '_' + currentSessionId;
+        let localHistory = JSON.parse(localStorage.getItem(key) || '[]');
+        
+        // Fetch favorites just to mark them in UI
+        let favoritesMap = {};
+        try {
+            const res = await fetch(host + '/api/favorites', {
+                headers: { 'Authorization': 'Bearer ' + currentToken }
+            });
+            const data = await res.json();
+            if (data.code === 200) {
+                data.data.forEach(f => favoritesMap[f.msg_id] = true);
+            }
+        } catch (e) {}
+
+        const box = document.getElementById('chat-box');
+        box.innerHTML = `
+            <div class="msg-row ai" id="welcome-msg">
+                <div class="msg-bubble">你好！我是 WClaw 控制端。连接已就绪，请输入指令控制本地电脑。</div>
+            </div>`;
+        
+        localHistory.forEach(msg => {
+            const time = new Date(msg.timestamp).toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            const date = new Date(msg.timestamp).toLocaleDateString('zh-CN', {year: 'numeric', month: '2-digit', day: '2-digit'}).replace(/\//g, '-');
+            const fullTime = `${date} ${time}`;
+            const safeContent = encodeURIComponent(msg.content).replace(/'/g, "%27");
+            const isFav = favoritesMap[msg.id] ? true : false;
+            const favClass = isFav ? 'active' : '';
+            const favStyle = isFav ? 'color: #FF9500;' : '';
+            const execTimeDisplay = msg.executionSeconds ? (() => {
+                const m = String(Math.floor(msg.executionSeconds / 60)).padStart(2, '0');
+                const s = String(msg.executionSeconds % 60).padStart(2, '0');
+                return `<span class="exec-time">⏱ ${m}:${s}</span>`;
+            })() : '';
+            
+            const checkboxHtml = `<input type="checkbox" class="batch-checkbox" value="${msg.id}" style="display:none; margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" onchange="updateBatchCount()">`;
+            
+            if (msg.role === 'user') {
+                box.insertAdjacentHTML('beforeend', `
+                    <div class="msg-row user" id="row-${msg.id}" style="flex-direction: row; align-items: center; justify-content: flex-end; width: 100%;">
+                        <div class="msg-wrapper user">
+                            <div class="msg-bubble">${renderMessageContent(msg.content, true)}</div>
+                            <div class="msg-time">${fullTime}
+                                <i class="fa-solid fa-quote-left btn-action quote-btn" title="引用" onclick="quoteMessage('${msg.id}', '${safeContent}', 'user')"></i>
+                                <i class="fa-regular fa-copy btn-action" title="复制" onclick="copyText(this, '${safeContent}')"></i>
+                                <i id="star-${msg.id}" class="fa-regular fa-star btn-action ${favClass}" style="${favStyle}" title="收藏" onclick="addFavorite(this, '${msg.id}', '${safeContent}')"></i>
+                                <i class="fa-regular fa-trash-can btn-action" title="删除" onclick="deleteMessage('${msg.id}')"></i>
+                            </div>
+                        </div>
+                        ${checkboxHtml}
+                    </div>
+                `);
+            } else {
+                const errorClass = msg.status === 'error' ? 'error' : '';
+                const safeContent = encodeURIComponent(msg.content).replace(/'/g, "%27");
+                const streamingIndicator = msg.status === 'streaming' ? '<span class="loading-dots"></span>' : '';
+                const historyBackend = msg.backend || 'openclaw';
+                const historyBadge = historyBackend === 'hermes' ? 'Hermes' : 'OpenClaw';
+                box.insertAdjacentHTML('beforeend', `
+                    <div class="msg-row ai ${errorClass}" id="row-${msg.id}" style="flex-direction: row; align-items: center; justify-content: flex-start; width: 100%;">
+                        ${checkboxHtml}
+                        <div class="msg-wrapper ai">
+                            <div class="msg-bubble">${renderMessageContent(msg.content, false, true)}${streamingIndicator}</div>
+                            <div class="msg-time"><span class="backend-badge ${historyBackend}">${historyBadge}</span>${fullTime} ${execTimeDisplay}
+                                <img id="play-btn-${msg.id}" class="btn-action" src="icon/play.png" title="播放语音" style="cursor:pointer; display:inline;" onclick="handlePlayClick('${msg.id}', '${safeContent}', this)">
+                                <i class="fa-solid fa-quote-left btn-action quote-btn" title="引用" onclick="quoteMessage('${msg.id}', '${safeContent}', 'ai')"></i>
+                                <i class="fa-regular fa-copy btn-action" title="复制" onclick="copyText(this, '${safeContent}')"></i>
+                                <i class="fa-solid fa-share btn-action" title="分享" onclick="shareMessage(this, '${safeContent}')"></i>
+                                <i id="star-${msg.id}" class="fa-regular fa-star btn-action ${favClass}" style="${favStyle}" title="收藏" onclick="addFavorite(this, '${msg.id}', '${safeContent}')"></i>
+                                <i class="fa-regular fa-trash-can btn-action" title="删除" onclick="deleteMessage('${msg.id}')"></i>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            }
+        });
+        
+        setTimeout(scrollToBottom, 100);
+    }
+
+    let isBatchMode = false;
+
+    function toggleBatchDelete() {
+        isBatchMode = !isBatchMode;
+        const bar = document.getElementById('batch-delete-bar');
+        const checkboxes = document.querySelectorAll('.batch-checkbox');
+        const btnBatch = document.getElementById('btn-batch-delete');
+        
+        if (isBatchMode) {
+            bar.style.display = 'flex';
+            btnBatch.style.background = 'rgba(10, 132, 255, 0.2)';
+            checkboxes.forEach(cb => {
+                cb.style.display = 'block';
+                cb.checked = false;
+            });
+            updateBatchCount();
+        } else {
+            bar.style.display = 'none';
+            btnBatch.style.background = '';
+            checkboxes.forEach(cb => cb.style.display = 'none');
+        }
+    }
+
+    function updateBatchCount() {
+        const count = document.querySelectorAll('.batch-checkbox:checked').length;
+        document.getElementById('batch-count').innerText = count;
+    }
+
+    function executeBatchDelete() {
+        const checked = document.querySelectorAll('.batch-checkbox:checked');
+        if (checked.length === 0) {
+            return showAlert('error', '请先选择要删除的记录');
+        }
+        if (confirm('是否删除？')) {
+            const idsToDelete = Array.from(checked).map(cb => cb.value);
+            removeLocalHistory(idsToDelete);
+            idsToDelete.forEach(id => {
+                const el = document.getElementById(`row-${id}`);
+                if (el) el.remove();
+            });
+            toggleBatchDelete(); // 退出批量模式
+        }
+    }
+
+    // ===== 批量删除会话 =====
+    function toggleBatchSessionDelete() {
+        isSessionBatchMode = !isSessionBatchMode;
+        const bar = document.getElementById('batch-session-bar');
+        const btnBatch = document.getElementById('btn-batch-session');
+        const checkboxes = document.querySelectorAll('.session-batch-checkbox');
+
+        if (isSessionBatchMode) {
+            bar.style.display = 'flex';
+            btnBatch.style.background = 'rgba(10, 132, 255, 0.2)';
+            checkboxes.forEach(cb => {
+                cb.style.display = 'block';
+                cb.checked = false;
+            });
+            updateSessionBatchCount();
+            var selectAllBtn = document.getElementById('btn-select-all-sessions');
+            if (selectAllBtn) selectAllBtn.innerText = '全选';
+        } else {
+            bar.style.display = 'none';
+            btnBatch.style.background = '';
+            checkboxes.forEach(cb => cb.style.display = 'none');
+        }
+    }
+
+    function updateSessionBatchCount() {
+        const count = document.querySelectorAll('.session-batch-checkbox:checked').length;
+        document.getElementById('session-batch-count').innerText = count;
+    }
+
+    function selectAllSessions() {
+        const checkboxes = document.querySelectorAll('.session-batch-checkbox');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        checkboxes.forEach(cb => cb.checked = !allChecked);
+        updateSessionBatchCount();
+        // 更新全选按钮文字
+        document.getElementById('btn-select-all-sessions').innerText = allChecked ? '全选' : '取消全选';
+    }
+
+    function executeBatchSessionDelete() {
+        const checked = document.querySelectorAll('.session-batch-checkbox:checked');
+        if (checked.length === 0) {
+            return showAlert('error', '请先选择要删除的会话');
+        }
+        if (confirm('确定删除选中的 ' + checked.length + ' 个对话吗？\n对应的聊天记录也会一并删除。')) {
+            const idsToDelete = Array.from(checked).map(cb => cb.value);
+            idsToDelete.forEach(id => {
+                sessions = sessions.filter(s => s.id !== id);
+                localStorage.removeItem('wclaw_history_' + currentUser + '_' + id);
+            });
+            if (sessions.length === 0) {
+                createNewSession(true);
+            } else if (idsToDelete.includes(currentSessionId)) {
+                currentSessionId = sessions[0].id;
+                loadHistory();
+            }
+            saveSessions();
+            renderSessionList();
+            updateSendBtnBySessionState();
+            toggleBatchSessionDelete(); // 退出批量模式
+        }
+    }
+
+    function deleteMessage(msgId) {
+        if (confirm('是否删除？')) {
+            removeLocalHistory([msgId]);
+            const el = document.getElementById(`row-${msgId}`);
+            if (el) el.remove();
+        }
+    }
+
+    function clearAllHistory() {
+        if (confirm('是否清空当前聊天记录？')) {
+            clearLocalHistory();
+            const box = document.getElementById('chat-box');
+            box.innerHTML = `
+                <div class="msg-row ai" id="welcome-msg">
+                    <div class="msg-bubble">你好！我是 WClaw 控制端。连接已就绪，请输入指令控制本地电脑。</div>
+                </div>`;
+        }
+    }
+
+    function logout() {
+        // 清理所有会话的执行状态
+        Object.keys(sessionExecutionStates).forEach(sessionId => {
+            cleanupSessionState(sessionId);
+        });
+        sessionExecutionStates = {};
+        
+        if (executionTimer) {
+            clearInterval(executionTimer);
+            executionTimer = null;
+        }
+        heartbeatFailures = 0;
+        hideNotice();
+
+        localStorage.removeItem('wclaw_token');
+        localStorage.removeItem('wclaw_user');
+        currentToken = null;
+        currentUser = null;
+        currentSessionId = null;
+        sessions = [];
+        document.getElementById('login-area').style.display = 'flex';
+        document.getElementById('app-area').style.display = 'none';
+        document.getElementById('connection-error-banner').style.display = 'none';
+        
+        document.getElementById('chat-box').innerHTML = `
+            <div class="msg-row ai">
+                <div class="msg-bubble">你好！我是 WClaw 控制端。连接已就绪，请输入指令控制本地电脑。</div>
+            </div>`;
+    }
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            const cmdInput = document.getElementById('command');
+            if (cmdInput.value.trim()) {
+                sendCommand();
+            }
+        }
+    }
+
+    function autoResize(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+    }
+
+    function organizeMsgTime() {
+        if (window.innerWidth > 768) return;
+        document.querySelectorAll('.msg-time').forEach(function(el) {
+            if (el.querySelector('.msg-actions')) return;
+            var timeWrapper = document.createElement('span');
+            timeWrapper.className = 'msg-time-text';
+            var actionWrapper = document.createElement('span');
+            actionWrapper.className = 'msg-actions';
+            var nodes = Array.from(el.childNodes);
+            nodes.forEach(function(node) {
+                if (node.nodeType === 1 && node.classList.contains('btn-action')) {
+                    actionWrapper.appendChild(node);
+                } else {
+                    timeWrapper.appendChild(node);
+                }
+            });
+            if (timeWrapper.childNodes.length > 0) el.appendChild(timeWrapper);
+            if (actionWrapper.childNodes.length > 0) el.appendChild(actionWrapper);
+        });
+    }
+
+    function scrollToBottom() {
+        const chatBox = document.getElementById('chat-box');
+        chatBox.scrollTop = chatBox.scrollHeight;
+        organizeMsgTime();
+    }
+
+    function scrollToTop() {
+        const chatBox = document.getElementById('chat-box');
+        chatBox.scrollTop = 0;
+    }
+
+    // 滚动按钮显示/隐藏控制
+    function setupScrollButtons() {
+        const chatBox = document.getElementById('chat-box');
+        const scrollBtns = document.getElementById('scroll-buttons');
+        if (!chatBox || !scrollBtns) return;
+
+        function updateScrollButtons() {
+            const isNearTop = chatBox.scrollTop < 50;
+            const isNearBottom = chatBox.scrollTop + chatBox.clientHeight >= chatBox.scrollHeight - 50;
+            const hasScroll = chatBox.scrollHeight > chatBox.clientHeight;
+
+            if (hasScroll) {
+                scrollBtns.style.display = 'flex';
+                const btnTop = scrollBtns.querySelector('button:last-child');
+                const btnBottom = scrollBtns.querySelector('button:first-child');
+                btnTop.style.opacity = isNearTop ? '0.3' : '1';
+                btnTop.style.pointerEvents = isNearTop ? 'none' : 'auto';
+                btnBottom.style.opacity = isNearBottom ? '0.3' : '1';
+                btnBottom.style.pointerEvents = isNearBottom ? 'none' : 'auto';
+            } else {
+                scrollBtns.style.display = 'none';
+            }
+        }
+
+        chatBox.addEventListener('scroll', updateScrollButtons);
+        updateScrollButtons();
+    }
+
+    // 滚动按钮长按切换左右侧
+    function setupJumpScrollButtons() {
+        const container = document.getElementById('scroll-buttons');
+        if (!container) return;
+
+        // 加载保存的位置
+        const saved = localStorage.getItem('scrollBtnPos');
+        if (saved) {
+            try {
+                const pos = JSON.parse(saved);
+                if (pos.side === 'left') {
+                    container.style.left = pos.left || '16px';
+                    container.style.right = 'auto';
+                } else {
+                    container.style.right = pos.right || '16px';
+                    container.style.left = 'auto';
+                }
+                container.style.bottom = pos.bottom || '180px';
+            } catch (e) {}
+        }
+
+        let timer = null;
+
+        function onPointerDown(e) {
+            timer = setTimeout(() => {
+                const isOnLeft = container.style.left && container.style.left !== 'auto' && container.style.left !== '';
+                if (isOnLeft) {
+                    // 跳到右侧
+                    container.style.right = '16px';
+                    container.style.left = 'auto';
+                } else {
+                    // 跳到左侧
+                    container.style.left = '16px';
+                    container.style.right = 'auto';
+                }
+                // 保存位置
+                const pos = {
+                    bottom: container.style.bottom || '180px',
+                    side: isOnLeft ? 'right' : 'left'
+                };
+                if (pos.side === 'left') {
+                    pos.left = container.style.left;
+                } else {
+                    pos.right = container.style.right;
+                }
+                localStorage.setItem('scrollBtnPos', JSON.stringify(pos));
+                // 阻止长按后按钮的 onclick 触发
+                const prevent = (ce) => {
+                    ce.stopPropagation();
+                    ce.preventDefault();
+                    container.removeEventListener('click', prevent, true);
+                };
+                container.addEventListener('click', prevent, true);
+                e.preventDefault();
+            }, 300);
+        }
+
+        function onPointerMove(e) {
+            if (!timer) return;
+            clearTimeout(timer);
+            timer = null;
+        }
+
+        function onPointerUp() {
+            clearTimeout(timer);
+            timer = null;
+        }
+
+        container.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointercancel', onPointerUp);
+    }
+
+    // 页面加载时初始化滚动按钮
+    (function() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(setupScrollButtons, 500);
+                setTimeout(setupJumpScrollButtons, 500);
+            });
+        } else {
+            setTimeout(setupScrollButtons, 500);
+            setTimeout(setupJumpScrollButtons, 500);
+        }
+    })();
+
+    function resetSendBtn(sessionId) {
+        const targetSessionId = sessionId || currentSessionId;
+        const sessionState = getSessionState(targetSessionId);
+        console.log(`[DEBUG resetSendBtn] sessionId: ${sessionId}, targetSessionId: ${targetSessionId}, isExecuting: ${sessionState.isExecuting}, hasEventSource: ${!!sessionState.eventSource}, msgId: ${sessionState.msgId}, new Error().stack`);
+
+        sessionState.isExecuting = false;
+
+        if (targetSessionId === currentSessionId) {
+            // 如果远程还在执行当前会话，保持执行状态的 UI
+            if (targetSessionId in remoteExecutingSessions) {
+                updateSendBtnBySessionState();
+                stopExecutionTimer(targetSessionId);
+                return;
+            }
+
+            const btn = document.getElementById('send-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            btn.disabled = false;
+            btn.style.display = 'flex';
+            stopBtn.style.display = 'none';
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+        }
+        
+        stopExecutionTimer(targetSessionId);
+    }
+
+    // 根据当前会话状态设置按钮状态（同时考虑本地执行和远程执行）
+    function updateSendBtnBySessionState() {
+        const sessionState = getSessionState(currentSessionId);
+        const btn = document.getElementById('send-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const statusBar = document.getElementById('status-bar');
+        const timerEl = document.getElementById('status-timer');
+
+        // 检查当前会话是否在远程执行列表中
+        const isThisSessionRemote =
+            currentSessionId in remoteExecutingSessions &&
+            remoteExecutingSessions[currentSessionId] &&
+            remoteExecutingSessions[currentSessionId].since;
+
+        const isExecuting = sessionState.isExecuting || !!isThisSessionRemote;
+
+        if (isExecuting) {
+            btn.disabled = true;
+            btn.style.display = 'none';
+            stopBtn.style.display = 'flex';
+            if (statusBar) statusBar.style.display = 'flex';
+
+            if (sessionState.isExecuting) {
+                // 本地执行：使用会话自己的计时
+                const m = String(Math.floor(sessionState.executionSeconds / 60)).padStart(2, '0');
+                const s = String(sessionState.executionSeconds % 60).padStart(2, '0');
+                if (timerEl) timerEl.innerText = `${m}:${s}`;
+            } else if (isThisSessionRemote) {
+                // 远程执行：使用本地记录的 since 时间计算
+                const elapsed = Math.floor((Date.now() - remoteExecutingSessions[currentSessionId].since) / 1000);
+                const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                const s = String(elapsed % 60).padStart(2, '0');
+                if (timerEl) timerEl.innerText = `${m}:${s}`;
+            }
+        } else {
+            btn.disabled = false;
+            btn.style.display = 'flex';
+            stopBtn.style.display = 'none';
+            stopExecutionTimer(currentSessionId);
+        }
+    }
+
+    async function sendCommand() {
+        const cmdInput = document.getElementById('command');
+        const cmd = cmdInput.value.trim();
+        
+        // 如果没有输入文字，且没有待发送文件，则返回
+        if (!cmd && !pendingFile) return;
+        
+        const btn = document.getElementById('send-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        if (btn.disabled) return;
+        
+        // 设置当前会话的执行状态（清除之前的停止标记，使远程轮询正常工作）
+        const sessionState = getSessionState(currentSessionId);
+        window._userStoppedSession = null;
+        sessionState.isExecuting = true;
+        
+        btn.disabled = true;
+        btn.style.display = 'none';
+        stopBtn.style.display = 'flex';
+        
+        // 如果有文件，走上传加文字接口；如果只有文字，走纯文字接口
+        if (pendingFile) {
+            await sendFileWithCommand(cmd);
+        } else {
+            await sendTextCommand(cmd);
+        }
+    }
+
+    async function sendTextCommand(cmd) {
+        const cmdInput = document.getElementById('command');
+        const msgId = 'msg-' + Date.now();
+        
+        // 保存当前的 sessionId，防止切换会话时消息路由错误
+        const activeSessionId = currentSessionId;
+        console.log(`[sendTextCommand] msgId: ${msgId}, activeSessionId: ${activeSessionId}, currentSessionId: ${currentSessionId}`);
+        
+        let finalCmd = cmd;
+        if (quotedMessage) {
+            finalCmd = `引用消息："${quotedMessage.content}"\n\n${cmd}`;
+            quotedMessage = null;
+            const existingIndicator = document.querySelector('.quote-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+        }
+        
+        const displayCmd = cmd;
+        finalCmd = cmd;
+        
+        const box = document.getElementById('chat-box');
+        const time = new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        const date = new Date().toLocaleDateString('zh-CN', {year: 'numeric', month: '2-digit', day: '2-digit'}).replace(/\//g, '-');
+        const fullTime = `${date} ${time}`;
+        const safeDisplayCmd = encodeURIComponent(displayCmd).replace(/'/g, "%27");
+
+        saveToLocalHistory({
+            id: msgId,
+            role: 'user',
+            content: displayCmd,
+            timestamp: Date.now()
+        }, activeSessionId);
+        
+        box.insertAdjacentHTML('beforeend', `
+            <div class="msg-row user" id="row-${msgId}" style="flex-direction: row; align-items: center; justify-content: flex-end; width: 100%;">
+                <div class="msg-wrapper user">
+                    <div class="msg-bubble">${escapeHtml(displayCmd)}</div>
+                    <div class="msg-time">${fullTime}
+                        <i class="fa-solid fa-quote-left btn-action quote-btn" title="引用" onclick="quoteMessage('${msgId}', '${safeDisplayCmd}', 'user')"></i>
+                        <i class="fa-regular fa-copy btn-action" title="复制" onclick="copyText(this, '${safeDisplayCmd}')"></i>
+                        <i id="star-${msgId}" class="fa-regular fa-star btn-action" title="收藏" onclick="addFavorite(this, '${msgId}', '${safeDisplayCmd}')"></i>
+                        <i class="fa-regular fa-trash-can btn-action" title="删除" onclick="deleteMessage('${msgId}')"></i>
+                    </div>
+                </div>
+                <input type="checkbox" class="batch-checkbox" value="${msgId}" style="display:none; margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" onchange="updateBatchCount()">
+            </div>
+        `);
+
+        const replyMsgId = `reply-${msgId}`;
+        const backendBadge = currentBackend === 'hermes' ? 'Hermes' : 'OpenClaw';
+        box.insertAdjacentHTML('beforeend', `
+            <div class="msg-row ai" id="row-${replyMsgId}" style="flex-direction: row; align-items: center; justify-content: flex-start; width: 100%;">
+                <input type="checkbox" class="batch-checkbox" value="${replyMsgId}" style="display:none; margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" onchange="updateBatchCount()">
+                <div class="msg-wrapper ai">
+                    <div class="msg-bubble" id="${replyMsgId}">执行中<span class="loading-dots"></span></div>
+                    <div class="msg-time" id="time-row-${replyMsgId}">
+                        <span class="backend-badge ${currentBackend}">${backendBadge}</span>
+                        <img id="play-btn-${replyMsgId}" class="btn-action" src="icon/play.png" title="播放语音" style="cursor:pointer; display:none;">
+                    </div>
+                </div>
+            </div>
+        `);
+        
+        const sessionState = getSessionState(activeSessionId);
+        sessionState.msgId = replyMsgId;
+        sessionState.currentBackend = currentBackend;
+
+        scrollToBottom();
+        
+        // 重置输入框高度和内容
+        cmdInput.value = '';
+        cmdInput.style.height = 'auto';
+        
+        // 优化：先建立 SSE 连接，再发送命令
+        // 这样可以避免服务端收到 cclaw 消息时网页端还没建立连接的问题
+        startSSE(msgId, activeSessionId);
+        
+        try {
+            const res = await fetch(host + '/api/command', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + currentToken
+                },
+                body: JSON.stringify({ command: finalCmd, sessionId: activeSessionId, backend: currentBackend })
+            });
+            const data = await res.json();
+            
+            if (data.code !== 200) {
+                if (data.code === 401) {
+                    logout();
+                    showAlert('error', '登录已过期，请重新登录');
+                } else {
+                    updateHistoryError(msgId, data.message || '发送失败');
+                }
+                // SSE 已经建立，命令发送失败时关闭 SSE
+                const sessionState = getSessionState(activeSessionId);
+                if (sessionState.eventSource) {
+                    sessionState.eventSource.close();
+                    sessionState.eventSource = null;
+                }
+                resetSendBtn(activeSessionId);
+            }
+        } catch (e) {
+            updateHistoryError(msgId, '网络连接失败，请检查服务器');
+            // SSE 已经建立，网络错误时关闭 SSE
+            const sessionState = getSessionState(activeSessionId);
+            if (sessionState.eventSource) {
+                sessionState.eventSource.close();
+                sessionState.eventSource = null;
+            }
+            resetSendBtn(activeSessionId);
+        }
+    }
+
+    async function sendFileWithCommand(cmd) {
+        const cmdInput = document.getElementById('command');
+        const file = pendingFile;
+        const msgId = 'msg-' + Date.now();
+        const box = document.getElementById('chat-box');
+        
+        // 保存当前的 sessionId，防止切换会话时消息路由错误
+        const activeSessionId = currentSessionId;
+        const sessionState = getSessionState(activeSessionId);
+        sessionState.msgId = `reply-${msgId}`;
+        sessionState.currentBackend = currentBackend;
+        
+        let finalCmd = cmd;
+        if (quotedMessage) {
+            finalCmd = `引用消息："${quotedMessage.content}"\n\n${cmd}`;
+            quotedMessage = null;
+            const existingIndicator = document.querySelector('.quote-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+        }
+        
+        const displayText = cmd;
+        finalCmd = cmd;
+        const time = new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        const date = new Date().toLocaleDateString('zh-CN', {year: 'numeric', month: '2-digit', day: '2-digit'}).replace(/\//g, '-');
+        const fullTime = `${date} ${time}`;
+        
+        // 界面上展示：[文件] + 用户可能输入的文字（不显示提示词）
+        let displayHtml = '';
+        if (file.type.startsWith('image/')) {
+            const url = URL.createObjectURL(file);
+            displayHtml = `<img src="${url}" style="max-width: 100%; border-radius: 8px; margin-bottom: 8px; display: block;" />`;
+        } else {
+            displayHtml = `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <i class="fa-solid fa-file-lines" style="font-size: 24px;"></i>
+                                <span style="font-weight: 500;">${escapeHtml(file.name)}</span>
+                           </div>`;
+        }
+        if (displayText) {
+            displayHtml += `<div>${escapeHtml(displayText)}</div>`;
+        }
+        
+        const safeUploadContent = encodeURIComponent(displayText || file.name).replace(/'/g, "%27");
+        box.insertAdjacentHTML('beforeend', `
+            <div class="msg-row user" id="row-${msgId}" style="flex-direction: row; align-items: center; justify-content: flex-end; width: 100%;">
+                <div class="msg-wrapper user">
+                    <div class="msg-bubble">${displayHtml}<br><span style="font-size:12px; color:var(--text-sub);">上传中 <span class="loading-dots"></span></span></div>
+                    <div class="msg-time">${fullTime}
+                        <i class="fa-regular fa-copy btn-action" title="复制" onclick="copyText(this, '${safeUploadContent}')"></i>
+                    </div>
+                </div>
+                <input type="checkbox" class="batch-checkbox" value="${msgId}" style="display:none; margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" onchange="updateBatchCount()">
+            </div>
+        `);
+        scrollToBottom();
+
+        // 重置输入区
+        cmdInput.value = '';
+        cmdInput.style.height = 'auto';
+        clearPendingFile();
+
+        const formData = new FormData();
+        formData.append('file', file);
+        if (finalCmd) formData.append('command', finalCmd);
+        if (activeSessionId) formData.append('sessionId', activeSessionId);
+        formData.append('backend', currentBackend);
+
+        try {
+            const res = await fetch(host + '/api/upload_with_command', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + currentToken },
+                body: formData
+            });
+            const data = await res.json();
+            
+            if (data.code === 200) {
+                // 上传成功，更新消息气泡内容（转为标准 JSON 存储格式，以兼容历史记录渲染）
+                const row = document.getElementById(`row-${msgId}`);
+                if (row) {
+                    const displayContent = cmd ? JSON.stringify({type: data.data.isImage ? 'image' : 'file', url: data.data.url, name: data.data.name, size: file.size, text: displayText}) : JSON.stringify({type: data.data.isImage ? 'image' : 'file', url: data.data.url, name: data.data.name, size: file.size});
+                    const safeDisplayContent = encodeURIComponent(displayContent).replace(/'/g, "%27");
+
+                    row.innerHTML = `
+                        <div class="msg-wrapper user">
+                            <div class="msg-bubble">${renderMessageContent(displayContent)}</div>
+                            <div class="msg-time">${fullTime}
+                                <i class="fa-solid fa-quote-left btn-action quote-btn" title="引用" onclick="quoteMessage('${msgId}', '${safeDisplayContent}', 'user')"></i>
+                                <i class="fa-regular fa-copy btn-action" title="复制" onclick="copyText(this, '${safeDisplayContent}')"></i>
+                                <i id="star-${msgId}" class="fa-regular fa-star btn-action" title="收藏" onclick="addFavorite(this, '${msgId}', '${safeDisplayContent}')"></i>
+                                <i class="fa-regular fa-trash-can btn-action" title="删除" onclick="deleteMessage('${msgId}')"></i>
+                            </div>
+                        </div>
+                        <input type="checkbox" class="batch-checkbox" value="${msgId}" style="display:none; margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" onchange="updateBatchCount()">
+                    `;
+                    
+                    saveToLocalHistory({
+                        id: msgId,
+                        role: 'user',
+                        content: displayContent,
+                        timestamp: Date.now()
+                    });
+                }
+                
+                // 等待电脑端回复
+                const replyMsgId = `reply-${msgId}`;
+                const fileBackendBadge = currentBackend === 'hermes' ? 'Hermes' : 'OpenClaw';
+                box.insertAdjacentHTML('beforeend', `
+                    <div class="msg-row ai" id="row-${replyMsgId}" style="flex-direction: row; align-items: center; justify-content: flex-start; width: 100%;">
+                        <input type="checkbox" class="batch-checkbox" value="${replyMsgId}" style="display:none; margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" onchange="updateBatchCount()">
+                        <div class="msg-wrapper ai">
+                            <div class="msg-bubble" id="${replyMsgId}">等待接收端响应 <span class="loading-dots"></span></div>
+                            <div class="msg-time" id="time-row-${replyMsgId}">
+                                <span class="backend-badge ${currentBackend}">${fileBackendBadge}</span>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                const fileSessionState = getSessionState(activeSessionId);
+                fileSessionState.msgId = replyMsgId;
+                scrollToBottom();
+                startSSE(msgId, activeSessionId);
+            } else if (data.code === 401) {
+                logout();
+                showAlert('error', '登录已过期，请重新登录');
+                document.getElementById(`row-${msgId}`).remove();
+                resetSendBtn(activeSessionId);
+            } else {
+                showAlert('error', data.message || '发送失败');
+                document.getElementById(`row-${msgId}`).remove();
+                resetSendBtn(activeSessionId);
+            }
+        } catch (e) {
+            showAlert('error', '网络连接失败，请检查服务器');
+            document.getElementById(`row-${msgId}`).remove();
+            resetSendBtn(activeSessionId);
+        }
+    }
+
+    function startSSE(msgId, targetSessionId, reconnectAttempt = 0) {
+        // 使用传入的 sessionId 或当前会话的 ID
+        const sessionId = targetSessionId || currentSessionId;
+        console.log(`[startSSE] msgId: ${msgId}, targetSessionId: ${targetSessionId}, sessionId: ${sessionId}, currentSessionId: ${currentSessionId}`);
+        const sessionState = getSessionState(sessionId);
+        
+        // 清理之前的 SSE 连接
+        if (sessionState.eventSource) sessionState.eventSource.close();
+        if (sessionState.reconnectTimer) clearTimeout(sessionState.reconnectTimer);
+
+        // 重置所有状态标志，防止上一次执行的状态影响新的 SSE 连接
+        sessionState.sseCompleted = false;
+        sessionState.stoppedByUser = false;
+        sessionState.processedResults.clear();
+
+        // 记录当前正在等待的消息ID
+        sessionState.msgId = msgId;
+
+        try {
+            startExecutionTimer(sessionId);
+        } catch (e) {
+            console.error('[startSSE] startExecutionTimer 失败，继续创建 SSE:', e.message);
+        }
+
+        const sseUrl = `${host}/api/stream_result?token=${currentToken}&sessionId=${encodeURIComponent(sessionId)}`;
+        console.log(`[startSSE] 创建 SSE 连接: ${sseUrl}`);
+        sessionState.eventSource = new EventSource(sseUrl);
+        
+        sessionState.accumulatedOutput = '';
+        sessionState.streamSavedMsgId = `reply-${msgId}`;
+
+        sessionState.eventSource.onmessage = function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                const dataSessionId = data.sessionId || 'default';
+                const effectiveSessionId = (data.data && data.data._sessionId) || dataSessionId;
+                console.log(`[SSE onmessage] type: ${data.type}, dataSessionId: ${dataSessionId}, effectiveSessionId: ${effectiveSessionId}, sessionId: ${sessionId}`);
+
+                // 严格路由：只有 _sessionId 匹配才处理
+                if (effectiveSessionId !== sessionId) {
+                    console.log(`忽略来自其他会话的消息: effective=${effectiveSessionId} vs sessionId=${sessionId}`);
+                    return;
+                }
+
+                if (data.type === 'stream') {
+                    let text = stripAnsi(data.data.text);
+                    sessionState.accumulatedOutput += text;
+                    
+                    const replyMsgId = `reply-${msgId}`;
+                    const currentReplyEl = document.getElementById(replyMsgId);
+                    if (currentReplyEl) {
+                        currentReplyEl.innerHTML = renderMessageContent(sessionState.accumulatedOutput, true) + '<span class="loading-dots"></span>';
+                        scrollToBottom();
+                    }
+
+                    // 长连接模式下不自动结束会话，等待 done/result 事件或网络错误
+
+                    // 立即保存到 localStorage
+                    const key = 'wclaw_history_' + currentUser + '_' + sessionId;
+                    try {
+                        let history = JSON.parse(localStorage.getItem(key) || '[]');
+                        let existingIdx = history.findIndex(m => m.id === replyMsgId);
+                        if (existingIdx === -1) {
+                            history.push({
+                                id: replyMsgId,
+                                role: 'ai',
+                                content: sessionState.accumulatedOutput,
+                                status: 'streaming',
+                                timestamp: Date.now(),
+                                backend: sessionState.currentBackend || currentBackend
+                            });
+                        } else {
+                            history[existingIdx].content = sessionState.accumulatedOutput;
+                            history[existingIdx].status = 'streaming';
+                        }
+                        localStorage.setItem(key, JSON.stringify(history));
+                    } catch(e) {}
+                } else if (data.type === 'result') {
+                    console.log('[SSE] 收到 result 事件，准备停止执行计时器');
+                    if (sessionState.processedResults.has(msgId)) {
+                        console.log(`[SSE] 忽略已处理的 result: ${msgId}`);
+                        return;
+                    }
+                    sessionState.processedResults.add(msgId);
+
+                    if (sessionState.reconnectTimer) clearTimeout(sessionState.reconnectTimer);
+                    sessionState.reconnectAttempts = 0;
+                    const outputText = (data.data && data.data.stdout) ? data.data.stdout : '';
+
+                    const replyMsgId = `reply-${msgId}`;
+                    const resultContent = stripAnsi(outputText).trim() || '执行完成 (无输出)';
+                    const finalContent = resultContent + ' Exit';
+                    saveToLocalHistory({
+                        id: replyMsgId,
+                        role: 'ai',
+                        content: finalContent,
+                        status: 'success',
+                        timestamp: Date.now(),
+                        executionSeconds: sessionState.executionSeconds,
+                        backend: sessionState.currentBackend || currentBackend
+                    }, sessionId);
+
+                    updateHistoryResult(msgId, data.data);
+
+                    // AI回复完成
+                    stopExecutionTimer(sessionId);
+                    showExecutionTime(msgId, sessionId);
+                    console.log(`[DEBUG SSE result] sessionId: ${sessionId}, msgId: ${msgId}, will NOT resetSendBtn, isExecuting: ${sessionState.isExecuting}, hasEventSource: ${!!sessionState.eventSource}`);
+
+                    if (sessionState.doneTimeout) {
+                        clearTimeout(sessionState.doneTimeout);
+                        sessionState.doneTimeout = null;
+                    }
+                } else if (data.type === 'done') {
+                    console.log(`[DEBUG SSE done] sessionId: ${sessionId}, msgId: ${msgId}, sessionState.msgId: ${sessionState.msgId}, isExecuting: ${sessionState.isExecuting}, hasEventSource: ${!!sessionState.eventSource}`);
+                    if (sessionState.doneTimeout) {
+                        clearTimeout(sessionState.doneTimeout);
+                        sessionState.doneTimeout = null;
+                    }
+                    console.log(`[SSE] 收到 done 事件，会话 ${sessionId} 真正完成`);
+                    if (sessionState.reconnectTimer) clearTimeout(sessionState.reconnectTimer);
+                    sessionState.reconnectAttempts = 0;
+                    sessionState.sseCompleted = true;
+                    if (sessionState.eventSource) {
+                        sessionState.eventSource.close();
+                        sessionState.eventSource = null;
+                    }
+                    sessionState.msgId = null;
+                    // SSE done 代表执行真正结束，清理远程执行标记，防止状态栏重新弹出
+                    if (sessionId in remoteExecutingSessions) {
+                        delete remoteExecutingSessions[sessionId];
+                    }
+                    resetSendBtn(sessionId);
+                    showExecutionTime(msgId, sessionId);
+
+                    // 移除 loading 指示器并更新本地历史为完整内容
+                    const replyMsgId = `reply-${msgId}`;
+                    const replyEl = document.getElementById(replyMsgId);
+                    const finalText = (stripAnsi(sessionState.accumulatedOutput).trim() || '执行完成 (无输出)') + ' Exit';
+                    if (replyEl) {
+                        replyEl.innerHTML = renderMessageContent(sessionState.accumulatedOutput, false, true);
+                    }
+                    
+                    // 更新本地历史
+                    if (currentUser && sessionId) {
+                        const key = 'wclaw_history_' + currentUser + '_' + sessionId;
+                        try {
+                            let history = JSON.parse(localStorage.getItem(key) || '[]');
+                            const existingIdx = history.findIndex(m => m.id === replyMsgId);
+                            if (existingIdx !== -1) {
+                                // 如果已被手动停止，保留停止标记，不覆写
+                                if (history[existingIdx].content && history[existingIdx].content.includes('[已手动停止]')) {
+                                    history[existingIdx].executionSeconds = sessionState.executionSeconds;
+                                } else {
+                                    history[existingIdx].content = finalText;
+                                    history[existingIdx].status = 'success';
+                                    history[existingIdx].executionSeconds = sessionState.executionSeconds;
+                                    history[existingIdx].backend = sessionState.currentBackend || currentBackend;
+                                }
+                                localStorage.setItem(key, JSON.stringify(history));
+                            }
+                        } catch(e) {}
+                }
+                }
+            } catch(e) {
+                console.error('SSE消息解析失败:', e);
+            }
+        };
+
+        sessionState.eventSource.onerror = function() {
+            console.log(`[DEBUG SSE onerror] sessionId: ${sessionId}, msgId: ${sessionState.msgId}, reconnectAttempt: ${reconnectAttempt}, stoppedByUser: ${sessionState.stoppedByUser}, sseCompleted: ${sessionState.sseCompleted}, hasEventSource: ${!!sessionState.eventSource}, isExecuting: ${sessionState.isExecuting}`);
+            if (sessionState.doneTimeout) {
+                clearTimeout(sessionState.doneTimeout);
+                sessionState.doneTimeout = null;
+            }
+            if (sessionState.eventSource) {
+                sessionState.eventSource.close();
+                sessionState.eventSource = null;
+            }
+
+            // 用户主动停止，不触发重连
+            if (sessionState.stoppedByUser) {
+                sessionState.stoppedByUser = false;
+                return;
+            }
+
+            // SSE 已正常完成（收到 done），不触发重连
+            if (sessionState.sseCompleted) {
+                sessionState.sseCompleted = false;
+                return;
+            }
+
+            if (sessionState.msgId && reconnectAttempt < MAX_SSE_RECONNECT_ATTEMPTS) {
+                // 重连期间不显示断开横幅，避免闪一下
+                const delay = Math.min(SSE_RECONNECT_BASE_DELAY * Math.pow(2, reconnectAttempt), 10000);
+                console.log(`会话 ${sessionId} SSE 连接断开，${delay}ms 后尝试第 ${reconnectAttempt + 1} 次重连`);
+
+                sessionState.reconnectTimer = setTimeout(() => {
+                    startSSE(msgId, sessionId, reconnectAttempt + 1);
+                }, delay);
+            } else if (sessionState.msgId) {
+                // 所有重连尝试均失败，再显示断连横幅
+                const banner = document.getElementById('connection-error-banner');
+                banner.style.display = 'block';
+                resetSendBtn(sessionId);
+                if (!sessionState.accumulatedOutput) {
+                    updateHistoryError(msgId, '连接中断且重连失败，请重试');
+                } else {
+                    updateHistoryResult(msgId, { stdout: sessionState.accumulatedOutput + '\n\n[连接中断，请重试]' });
+                }
+                sessionState.msgId = null;
+                sessionState.reconnectAttempts = 0;
+            }
+        };
+    }
+
+    function addHistory(cmd, msgId, sessionId) {
+        const box = document.getElementById('chat-box');
+        const time = new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        const date = new Date().toLocaleDateString('zh-CN', {year: 'numeric', month: '2-digit', day: '2-digit'}).replace(/\//g, '-');
+        const fullTime = `${date} ${time}`;
+        const safeCmd = encodeURIComponent(cmd).replace(/'/g, "%27");
+
+        saveToLocalHistory({
+            id: msgId,
+            role: 'user',
+            content: cmd,
+            timestamp: Date.now()
+        }, sessionId);
+        
+        // 用户消息
+        box.insertAdjacentHTML('beforeend', `
+            <div class="msg-row user" id="row-${msgId}" style="flex-direction: row; align-items: center; justify-content: flex-end; width: 100%;">
+                <div class="msg-wrapper user">
+                    <div class="msg-bubble">${escapeHtml(cmd)}</div>
+                    <div class="msg-time">${fullTime}
+                        <i class="fa-solid fa-quote-left btn-action quote-btn" title="引用" onclick="quoteMessage('${msgId}', '${safeCmd}', 'user')"></i>
+                        <i class="fa-regular fa-copy btn-action" title="复制" onclick="copyText(this, '${safeCmd}')"></i>
+                        <i id="star-${msgId}" class="fa-regular fa-star btn-action" title="收藏" onclick="addFavorite(this, '${msgId}', '${safeCmd}')"></i>
+                        <i class="fa-regular fa-trash-can btn-action" title="删除" onclick="deleteMessage('${msgId}')"></i>
+                    </div>
+                </div>
+                <input type="checkbox" class="batch-checkbox" value="${msgId}" style="display:none; margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" onchange="updateBatchCount()">
+            </div>
+        `);
+
+        // AI 占位消息
+        const replyMsgId = `reply-${msgId}`;
+        const backendBadge = currentBackend === 'hermes' ? 'Hermes' : 'OpenClaw';
+        box.insertAdjacentHTML('beforeend', `
+            <div class="msg-row ai" id="row-${replyMsgId}" style="flex-direction: row; align-items: center; justify-content: flex-start; width: 100%;">
+                <input type="checkbox" class="batch-checkbox" value="${replyMsgId}" style="display:none; margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" onchange="updateBatchCount()">
+                <div class="msg-wrapper ai">
+                    <div class="msg-bubble" id="${replyMsgId}">执行中<span class="loading-dots"></span></div>
+                    <div class="msg-time" id="time-row-${replyMsgId}">
+                        <span class="backend-badge ${currentBackend}">${backendBadge}</span>
+                        <img id="play-btn-${replyMsgId}" class="btn-action" src="icon/play.png" title="播放语音" style="cursor:pointer; display:none;">
+                    </div>
+                </div>
+            </div>
+        `);
+        
+        // 更新会话状态，使用传入的 sessionId
+        const sessionState = getSessionState(sessionId);
+        sessionState.msgId = replyMsgId;
+        
+        scrollToBottom();
+    }
+
+    function updateHistoryResult(msgId, resultData) {
+        const replyMsgId = `reply-${msgId}`;
+        const replyEl = document.getElementById(replyMsgId);
+        const rowEl = document.getElementById(`row-${replyMsgId}`);
+        if (!replyEl) return;
+        
+        let output = resultData.stdout || '';
+        let error = resultData.stderr || '';
+        
+        output = stripAnsi(output);
+        error = stripAnsi(error);
+
+        let finalContent = '';
+        let status = 'success';
+        if (error) {
+            rowEl.classList.add('error');
+            finalContent = error;
+            status = 'error';
+        } else {
+            finalContent = (output.trim() || '执行完成 (无输出)') + ' Exit';
+        }
+        
+        replyEl.innerHTML = renderMessageContent(finalContent, false, true);
+        
+        // 更新时间戳和操作按钮
+        const time = new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        const date = new Date().toLocaleDateString('zh-CN', {year: 'numeric', month: '2-digit', day: '2-digit'}).replace(/\//g, '-');
+        const fullTime = `${date} ${time}`;
+        const safeContent = encodeURIComponent(finalContent).replace(/'/g, "%27");
+        
+        const existingTime = rowEl.querySelector('.msg-time');
+        const backendLabel = currentBackend === 'hermes' ? 'Hermes' : 'OpenClaw';
+        const backendHtml = `<span class="backend-badge ${currentBackend}">${backendLabel}</span>`;
+        if (existingTime) {
+            existingTime.innerHTML = `${backendHtml}<img id="play-btn-${replyMsgId}" class="btn-action" src="icon/play.png" title="播放语音" style="cursor:pointer; display:inline;" onclick="handlePlayClick('${replyMsgId}', '${safeContent}', this)">
+                <i class="fa-solid fa-quote-left btn-action quote-btn" title="引用" onclick="quoteMessage('${replyMsgId}', '${safeContent}', 'ai')"></i>
+                <i class="fa-regular fa-copy btn-action" title="复制" onclick="copyText(this, '${safeContent}')"></i>
+                <i class="fa-solid fa-share btn-action" title="分享" onclick="shareMessage(this, '${safeContent}')"></i>
+                <i id="star-${replyMsgId}" class="fa-regular fa-star btn-action" title="收藏" onclick="addFavorite(this, '${replyMsgId}', '${safeContent}')"></i>
+                <i class="fa-regular fa-trash-can btn-action" title="删除" onclick="deleteMessage('${replyMsgId}')"></i>
+                <span style="margin-left:2px;">${fullTime}</span>`;
+        } else {
+            replyEl.insertAdjacentHTML('afterend', `<div class="msg-time">${backendHtml}
+                <img id="play-btn-${replyMsgId}" class="btn-action" src="icon/play.png" title="播放语音" style="cursor:pointer; display:inline;" onclick="handlePlayClick('${replyMsgId}', '${safeContent}', this)">
+                <i class="fa-solid fa-quote-left btn-action quote-btn" title="引用" onclick="quoteMessage('${replyMsgId}', '${safeContent}', 'ai')"></i>
+                <i class="fa-regular fa-copy btn-action" title="复制" onclick="copyText(this, '${safeContent}')"></i>
+                <i class="fa-solid fa-share btn-action" title="分享" onclick="shareMessage(this, '${safeContent}')"></i>
+                <i id="star-${replyMsgId}" class="fa-regular fa-star btn-action" title="收藏" onclick="addFavorite(this, '${replyMsgId}', '${safeContent}')"></i>
+                <i class="fa-regular fa-trash-can btn-action" title="删除" onclick="deleteMessage('${replyMsgId}')"></i>
+            </div>`);
+        }
+
+        saveToLocalHistory({
+            id: replyMsgId,
+            role: 'ai',
+            content: finalContent,
+            status: status,
+            timestamp: Date.now(),
+            backend: currentBackend
+        });
+        
+        scrollToBottom();
+        
+        // 自动播放：触发播放按钮点击
+        if (ttsAutoPlayEnabled && status === 'success' && finalContent) {
+            setTimeout(function() {
+                var playBtn = document.getElementById('play-btn-' + replyMsgId);
+                if (playBtn) playBtn.click();
+            }, 300);
+        }
+
+        // AI 回复提醒（震动+铃声），与自动播放独立
+        if (status === 'success' && finalContent) {
+            triggerNotify();
+        }
+    }
+
+    function updateHistoryError(msgId, errorMsg) {
+        const replyMsgId = msgId.startsWith('reply-') ? msgId : `reply-${msgId}`;
+        const replyEl = document.getElementById(replyMsgId);
+        const rowEl = document.getElementById(`row-${replyMsgId}`);
+        if (replyEl) {
+            rowEl.classList.add('error');
+            
+            // 如果原本是正常的，移除之前的样式并添加 error 样式
+            rowEl.classList.remove('success');
+            
+            replyEl.innerText = errorMsg;
+            
+            const time = new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            const date = new Date().toLocaleDateString('zh-CN', {year: 'numeric', month: '2-digit', day: '2-digit'}).replace(/\//g, '-');
+            const fullTime = `${date} ${time}`;
+            const safeContent = encodeURIComponent(errorMsg).replace(/'/g, "%27");
+            const existingTime = rowEl.querySelector('.msg-time');
+            const errorBackendHtml = `<span class="backend-badge ${currentBackend}">${currentBackend === 'hermes' ? 'Hermes' : 'OpenClaw'}</span>`;
+            if (existingTime) {
+                existingTime.innerHTML = `${errorBackendHtml}<img id="play-btn-${replyMsgId}" class="btn-action" src="icon/play.png" title="播放语音" style="cursor:pointer; display:inline;" onclick="handlePlayClick('${replyMsgId}', '${safeContent}', this)">
+                    <i class="fa-solid fa-quote-left btn-action quote-btn" title="引用" onclick="quoteMessage('${replyMsgId}', '${safeContent}', 'ai')"></i>
+                    <i class="fa-regular fa-trash-can btn-action" title="删除" onclick="deleteMessage('${replyMsgId}')"></i>
+                    <span style="margin-left:2px;">${fullTime}</span>`;
+            } else {
+                replyEl.insertAdjacentHTML('afterend', `<div class="msg-time">${errorBackendHtml}${fullTime}
+                    <img id="play-btn-${replyMsgId}" class="btn-action" src="icon/play.png" title="播放语音" style="cursor:pointer; display:inline;" onclick="handlePlayClick('${replyMsgId}', '${safeContent}', this)">
+                    <i class="fa-solid fa-quote-left btn-action quote-btn" title="引用" onclick="quoteMessage('${replyMsgId}', '${safeContent}', 'ai')"></i>
+                    <i class="fa-regular fa-trash-can btn-action" title="删除" onclick="deleteMessage('${replyMsgId}')"></i>
+                </div>`);
+            }
+
+            saveToLocalHistory({
+                id: replyMsgId,
+                role: 'ai',
+                content: errorMsg,
+                status: 'error',
+                timestamp: Date.now(),
+                backend: currentBackend
+            });
+            
+            scrollToBottom();
+        }
+    }
+
+    function toggleHeaderActions(event) {
+        event.stopPropagation();
+        const actions = document.getElementById('header-actions');
+        actions.classList.toggle('open');
+    }
+
+    document.addEventListener('click', function(event) {
+        const actions = document.getElementById('header-actions');
+        const btnMore = document.querySelector('.btn-more-actions');
+        if (actions && actions.classList.contains('open')) {
+            if (!actions.contains(event.target) && !btnMore.contains(event.target)) {
+                actions.classList.remove('open');
+            }
+        }
+    });
+
+    // ===== 一键切换大模型 =====
+    function closeSwitchModel() {
+        document.getElementById('switch-model-modal').style.display = 'none';
+    }
+
+    async function executeSwitchModel(model) {
+        closeSwitchModel();
+
+        const modelName = model === 'deepseek' ? 'deepseek-v4-flash' : 'MiniMax-M2.7';
+        if (!confirm(`确定要切换至 ${modelName} 吗？\n\n切换过程中将:\n1. 更新本地配置\n2. 同步到云服务器\n3. 重启云服务器 cclaw 服务\n\n请确认操作。`)) return;
+
+        showAlert('info', `正在切换至 ${modelName}，请稍候...`);
+
+        try {
+            const res = await fetch(host + '/api/switch_model', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + currentToken
+                },
+                body: JSON.stringify({ model })
+            });
+            const data = await res.json();
+
+            if (data.code === 200) {
+                showAlert('success', `✅ 已切换至 ${modelName}`);
+                fetchCurrentModel();
+                console.log(data.output);
+            } else {
+                showAlert('error', data.message || '切换失败');
+                if (data.output) console.log(data.output);
+            }
+        } catch (e) {
+            showAlert('error', '网络错误，切换失败');
+        }
+    }
