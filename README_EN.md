@@ -134,6 +134,95 @@ curl http://localhost:60016/health
 # {"status":"ok","timestamp":"...","uptime":...}
 ```
 
+## 📝 Deployment Tips & Troubleshooting (Real-World Experience)
+
+### 1. xCrab startup error: Cannot find module sqlite-store.js
+
+**Problem**: The repository is missing `xCrab/src/memory/sqlite-store.js`, causing xCrab to fail on startup.
+
+**Solution**: Create this file manually (see full code in the repository).
+
+### 2. MiniMax API Address Configuration
+
+**Problem**: Using `https://api.minimaxi.com/anthropic` returns a 404 error.
+
+**Solution**: MiniMax uses OpenAI-compatible format. Configure as:
+
+```bash
+MINIMAX_BASE_URL=https://api.minimaxi.com/v1
+```
+
+### 3. eclaw Port Mismatch with cclaw
+
+**Problem**: eclaw defaults to port 10001, but cclaw connects to port 10090.
+
+**Solution**: Modify the port in `eclaw/server.js`:
+
+```javascript
+// Find and change this line
+const PORT = 10090;  // Originally 10001
+```
+
+### 4. PM2 Not Loading dotenv for xCrab
+
+**Problem**: Using `pm2 start ecosystem.config.cjs` may not load the .env file correctly.
+
+**Solution**: Start using npm start:
+
+```bash
+cd xCrab
+pm2 start npm --name xcrab -- start
+```
+
+Or start directly:
+
+```bash
+cd xCrab
+pm2 start index.js --name xcrab
+```
+
+### 5. MySQL Authentication Issues
+
+**Problem**: Ubuntu 24.04's MySQL 8.0 uses caching_sha2_password by default.
+
+**Solution**: Use the debian-sys-maint account or change authentication:
+
+```bash
+# View debian maintenance account password
+cat /etc/mysql/debian.cnf
+
+# Or change root authentication
+sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password';"
+```
+
+### 6. Deployment Verification Checklist
+
+```bash
+# 1. Check all service status
+pm2 status
+
+# 2. Check port usage
+ss -tlnp | grep -E ":(3000|10090)"
+
+# 3. Test xCrab API
+curl -X POST http://localhost:3000/api/chat \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Hello"}'
+
+# 4. Test eclaw API
+curl -X POST http://localhost:10090/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test","password":"test"}'
+
+# 5. View logs
+pm2 logs xcrab --lines 50
+pm2 logs eclaw --lines 50
+pm2 logs cclaw --lines 50
+```
+
+
+
 ## License
 
 This project is open-sourced under the [MIT License](LICENSE).
