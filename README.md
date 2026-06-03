@@ -22,7 +22,7 @@ skillgate-agent/
 │   └── wclaw/             # Web 客户端前端
 ├── eclaw/                 # 服务分发器（后端）
 │   ├── server.js          # Express + WebSocket 服务
-│   ├── cloud-sync.js      # 云数据库同步
+│   ├── cloud-sync.js      # 数据库同步
 │   └── wclaw/             # Web 客户端副本
 └── cclaw/                 # 远程分发器（客户端）
     ├── index.js           # 主入口
@@ -38,7 +38,6 @@ skillgate-agent/
 - 🌐 **浏览器自动化** - 可选支持 Playwright 浏览器控制
 - 📡 **多模块架构** - 集成 xCrab、eclaw、cclaw、wclaw 四大模块
 - 📱 **短信验证** - 支持短信宝进行手机验证登录
-- ☁️ **云数据库** - 通过 SSH 隧道连接云 MySQL 数据库
 
 ---
 
