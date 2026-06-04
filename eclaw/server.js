@@ -1,11 +1,11 @@
 // 环境变量注入（云服务器部署用）
 process.env.DB_USER = process.env.DB_USER || 'wclaw_db';
-process.env.DB_PASS = process.env.DB_PASS || 'your_db_password_here';
+process.env.DB_PASS = process.env.DB_PASS || '100911yzpYZP';
 process.env.DB_NAME = process.env.DB_NAME || 'wclaw_db';
-process.env.XCRAB_TOKEN = process.env.XCRAB_TOKEN || 'your_xcrab_token_here';
+process.env.XCRAB_TOKEN = process.env.XCRAB_TOKEN || '100911yzpYZP@';
 process.env.YOLO_API_URL = process.env.YOLO_API_URL || 'http://localhost:60016';
-process.env.SMSBAO_USER = process.env.SMSBAO_USER || 'your_smsbao_user_here';
-process.env.SMSBAO_PASSWORD = process.env.SMSBAO_PASSWORD || 'your_smsbao_password_here';
+process.env.SMSBAO_USER = process.env.SMSBAO_USER || 'yzp100911';
+process.env.SMSBAO_PASSWORD = process.env.SMSBAO_PASSWORD || '100911yzpYZP';
 
 const express = require('express');
 const http = require('http');
@@ -55,7 +55,7 @@ app.get('/uploads/:filename', (req, res) => {
     }
 });
 
-const JWT_SECRET = 'your_jwt_secret_here';
+const JWT_SECRET = 'your-super-secret-key-for-eclaw';
 
 // xCrab Gateway 配置
 const XCRAB_API_URL = process.env.XCRAB_API_URL || 'http://localhost:3000';
@@ -429,10 +429,82 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// HTTP 接口：供 wclaw (手机端) 和 cclaw (电脑端) 登录 (升级为支持双重验证)
+// HTTP 接口：供 wclaw (手机端) 和 cclaw (电脑端) 登录 (升级为支持双重验证 + 验证码登录)
 app.post('/api/login', async (req, res) => {
-    const { username, password, phone, sms_code, device_token } = req.body;
-    
+    const { username, password, phone, sms_code, device_token, login_mode } = req.body;
+
+    // 验证码登录模式：仅通过手机号+验证码登录
+    if (login_mode === 'sms') {
+        if (!phone || !sms_code) {
+            return res.status(400).json({ code: 400, message: '请填写手机号和验证码' });
+        }
+
+        // 校验短信验证码
+        const record = verificationCodes.get(phone);
+        if (!record || record.code !== sms_code || Date.now() > record.expire) {
+            return res.status(400).json({ code: 400, message: '验证码错误或已过期' });
+        }
+
+        try {
+            // 通过手机号查找用户
+            const [users] = await pool.execute(
+                "SELECT * FROM users WHERE phone = ?",
+                [phone]
+            );
+
+            if (users.length === 0) {
+                return res.status(401).json({ code: 401, message: '该手机号未注册' });
+            }
+
+            let user;
+            if (users.length === 1) {
+                // 只有一个账号，直接登录
+                user = users[0];
+            } else {
+                // 多个账号，需要用户指定
+                if (!username) {
+                    const accountList = users.map(u => u.username);
+                    return res.status(409).json({
+                        code: 409,
+                        message: '该手机号绑定了多个账号，请选择',
+                        data: { accounts: accountList, need_select: true }
+                    });
+                }
+                // 用户指定了账号，查找匹配的
+                user = users.find(u => u.username === username);
+                if (!user) {
+                    return res.status(401).json({ code: 401, message: '账号与手机号不匹配' });
+                }
+            }
+
+            const tokenUsername = user.username;
+
+            // 签发 token
+            const token = jwt.sign({ username: tokenUsername }, JWT_SECRET, { expiresIn: '7d' });
+            const newDeviceToken = jwt.sign({ type: 'device', username: tokenUsername }, JWT_SECRET, { expiresIn: '365d' });
+
+            // 登录成功，消耗验证码
+            verificationCodes.delete(phone);
+
+            res.json({
+                code: 200,
+                message: '登录成功',
+                data: {
+                    token,
+                    username: tokenUsername,
+                    device_token: newDeviceToken,
+                    canUseCloud: isCloudAllowed(tokenUsername),
+                    phone: user.phone
+                }
+            });
+        } catch (err) {
+            console.error("验证码登录查询失败:", err);
+            res.status(500).json({ code: 500, message: '服务器内部错误' });
+        }
+        return;
+    }
+
+    // 密码登录模式（原有逻辑）
     if (!username || !password) {
         return res.status(400).json({ code: 400, message: '请填写账号和密码' });
     }
@@ -457,6 +529,7 @@ app.post('/api/login', async (req, res) => {
     }
 
     try {
+        let userPhone = null;
         if (!isTrusted) {
             if (!phone || !sms_code) {
                 return res.status(400).json({ code: 400, message: '新设备登录，请填写手机号和验证码' });
@@ -466,36 +539,39 @@ app.post('/api/login', async (req, res) => {
             if (!record || record.code !== sms_code || Date.now() > record.expire) {
                 return res.status(400).json({ code: 400, message: '验证码错误或已过期' });
             }
-            
+
             // 校验绑定的手机号是否匹配
             const [users] = await pool.execute(
-                "SELECT * FROM users WHERE username = ? AND password = ? AND phone = ?", 
+                "SELECT * FROM users WHERE username = ? AND password = ? AND phone = ?",
                 [username, password, phone]
             );
-            
+
             if (users.length === 0) {
                 return res.status(401).json({ code: 401, message: '账号、密码或手机号不匹配' });
             }
-            
+
+            userPhone = users[0].phone;
             // 登录成功，消耗验证码
             verificationCodes.delete(phone);
         } else {
             // 信任设备，只校验账号密码
             const [users] = await pool.execute(
-                "SELECT * FROM users WHERE username = ? AND password = ?", 
+                "SELECT * FROM users WHERE username = ? AND password = ?",
                 [username, password]
             );
-            
+
             if (users.length === 0) {
                 return res.status(401).json({ code: 401, message: '账号或密码错误' });
             }
+
+            userPhone = users[0].phone;
         }
 
         // 签发 token
         const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '7d' });
         const newDeviceToken = jwt.sign({ type: 'device', username }, JWT_SECRET, { expiresIn: '365d' });
-        
-        res.json({ code: 200, message: '登录成功', data: { token, username, device_token: newDeviceToken, canUseCloud: isCloudAllowed(username) } });
+
+        res.json({ code: 200, message: '登录成功', data: { token, username, device_token: newDeviceToken, canUseCloud: isCloudAllowed(username), phone: userPhone } });
     } catch (err) {
         console.error("登录查询失败:", err);
         res.status(500).json({ code: 500, message: '服务器内部错误' });
@@ -1674,6 +1750,22 @@ app.get('/api/xcrab/current_model', async (req, res) => {
 
 /** xCrab 切换模型 */
 app.post('/api/xcrab/switch_model', async (req, res) => {
+    // 非授权手机号只允许使用 MiniMax-M2.7
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+        try {
+            const decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
+            const model = req.body.model;
+            if (model && model !== 'minimax') {
+                const [userRows] = await pool.execute('SELECT phone FROM users WHERE username = ?', [decoded.username]);
+                const userPhone = userRows.length > 0 ? userRows[0].phone : null;
+                if (userPhone !== '18520937520') {
+                    return res.status(403).json({ code: 403, message: '您的手机号无权切换至该模型，仅可使用 MiniMax-M2.7' });
+                }
+            }
+        } catch (e) {}
+    }
+
     try {
         const resp = await fetch(`${XCRAB_API_URL}/api/switch_model`, {
             method: 'POST',
@@ -1787,15 +1879,17 @@ app.get('/api/client_status', async (req, res) => {
 
         // 检查用户手机号是否获得 xCrab 授权
         let isAuthorized = canUseCloud;
-        if (!isAuthorized) {
-            const [userRows] = await pool.execute('SELECT phone FROM users WHERE username = ?', [username]);
-            if (userRows.length > 0 && userRows[0].phone) {
-                const [authRows] = await pool.execute('SELECT id FROM authorized_phones WHERE phone = ?', [userRows[0].phone]);
-                isAuthorized = authRows.length > 0;
-            }
+        let userPhone = null;
+        const [userRows] = await pool.execute('SELECT phone FROM users WHERE username = ?', [username]);
+        if (userRows.length > 0) {
+            userPhone = userRows[0].phone;
+        }
+        if (!isAuthorized && userPhone) {
+            const [authRows] = await pool.execute('SELECT id FROM authorized_phones WHERE phone = ?', [userPhone]);
+            isAuthorized = authRows.length > 0;
         }
 
-        res.json({ code: 200, connected: isConnected, canUseCloud, isAuthorized });
+        res.json({ code: 200, connected: isConnected, canUseCloud, isAuthorized, phone: userPhone });
     } catch (err) {
         return res.status(401).json({ code: 401, message: 'Token 无效' });
     }
@@ -2056,13 +2150,14 @@ app.get('/api/current_model', (req, res) => {
 
 // HTTP 接口：一键切换大模型
 const { execSync } = require('child_process');
-app.post('/api/switch_model', (req, res) => {
+app.post('/api/switch_model', async (req, res) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) return res.status(401).json({ code: 401, message: '未提供 Token' });
 
-    const token = authHeader.split(' ')[1];
+    let username;
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
+        username = decoded.username;
     } catch (err) {
         return res.status(401).json({ code: 401, message: 'Token 无效或已过期' });
     }
@@ -2070,6 +2165,15 @@ app.post('/api/switch_model', (req, res) => {
     const { model } = req.body;
     if (!model || !['deepseek', 'minimax', 'mimo'].includes(model)) {
         return res.status(400).json({ code: 400, message: '无效的模型参数，请指定 deepseek、minimax 或 mimo' });
+    }
+
+    // 非授权手机号只允许使用 MiniMax-M2.7
+    if (model !== 'minimax') {
+        const [userRows] = await pool.execute('SELECT phone FROM users WHERE username = ?', [username]);
+        const userPhone = userRows.length > 0 ? userRows[0].phone : null;
+        if (userPhone !== '18520937520') {
+            return res.status(403).json({ code: 403, message: '您的手机号无权切换至该模型，仅可使用 MiniMax-M2.7' });
+        }
     }
 
     const scriptPath = process.platform === 'win32'
