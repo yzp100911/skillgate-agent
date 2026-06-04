@@ -2958,8 +2958,30 @@ ${cmd}` : cmd;
         document.getElementById('switch-model-modal').style.display = 'none';
     }
 
+    function updateModelButtons() {
+        var isRestricted = currentPhone !== '18520937520';
+        var dsBtn = document.getElementById('btn-model-deepseek');
+        var mimoBtn = document.getElementById('btn-model-mimo');
+        if (dsBtn) {
+            dsBtn.disabled = isRestricted;
+            dsBtn.style.opacity = isRestricted ? '0.4' : '1';
+            dsBtn.style.pointerEvents = isRestricted ? 'none' : 'auto';
+        }
+        if (mimoBtn) {
+            mimoBtn.disabled = isRestricted;
+            mimoBtn.style.opacity = isRestricted ? '0.4' : '1';
+            mimoBtn.style.pointerEvents = isRestricted ? 'none' : 'auto';
+        }
+    }
+
     async function executeSwitchModel(model) {
         closeSwitchModel();
+
+        // 非授权手机号只允许使用 MiniMax-M2.7
+        if (model !== 'minimax' && currentPhone !== '18520937520') {
+            showAlert('error', '您的手机号无权切换至该模型，仅可使用 MiniMax-M2.7');
+            return;
+        }
 
         const modelName = model === 'deepseek' ? 'deepseek-v4-flash[1M]' : model === 'mimo' ? 'mimo-v2.5-pro[1M]' : 'MiniMax-M2.7';
         if (!confirm(`确定要切换至 ${modelName} 吗？\n\n切换过程中将:\n1. 更新本地配置\n2. 同步到云服务器\n3. 重启云服务器 ${currentBackend === 'xcrab' ? 'xCrab' : 'cclaw'} 服务\n\n请确认操作。`)) return;

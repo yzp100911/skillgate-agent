@@ -137,6 +137,7 @@
     var currentToken = localStorage.getItem('wclaw_token');
     var currentUser = localStorage.getItem('wclaw_user');
     var currentCanUseCloud = false; // 仅用于信息展示，不影响功能
+    var currentPhone = null; // 当前用户手机号
     var savedUser = localStorage.getItem('wclaw_saved_user');
     var savedPwd = localStorage.getItem('wclaw_saved_pwd');
     var deviceToken = localStorage.getItem('wclaw_device_token');
@@ -587,6 +588,7 @@
         playTextAsSpeech(testText, testMsgId);
     };
     var currentTab = 'login';
+    var loginMode = 'password'; // 'password' 或 'sms'
 
     var currentEventSource = null;
     var currentMsgId = null;

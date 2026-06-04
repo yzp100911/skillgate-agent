@@ -1,20 +1,48 @@
+    function switchLoginMode(mode) {
+        loginMode = mode;
+        document.getElementById('mode-password').className = mode === 'password' ? 'login-mode-btn active' : 'login-mode-btn';
+        document.getElementById('mode-sms').className = mode === 'sms' ? 'login-mode-btn active' : 'login-mode-btn';
+        updateLoginUI();
+    }
+
     function updateLoginUI() {
         const u = document.getElementById('username').value;
+        const usernameGroup = document.getElementById('username-group');
+        const passwordGroup = document.getElementById('password-group');
         const phoneGroup = document.getElementById('phone-group');
         const smsGroup = document.getElementById('sms-group');
         const rememberGroup = document.getElementById('remember-group');
-        
+        const loginModeSwitch = document.getElementById('login-mode-switch');
+
         if (currentTab === 'login') {
+            loginModeSwitch.style.display = 'flex';
             rememberGroup.style.display = 'flex';
-            if (deviceToken && lastTrustedUser && u === lastTrustedUser) {
-                phoneGroup.style.display = 'none';
-                smsGroup.style.display = 'none';
-            } else {
+
+            if (loginMode === 'sms') {
+                // 验证码登录模式：隐藏用户名和密码，显示手机号和验证码
+                usernameGroup.style.display = 'none';
+                passwordGroup.style.display = 'none';
                 phoneGroup.style.display = 'block';
                 smsGroup.style.display = 'flex';
+            } else {
+                // 密码登录模式
+                usernameGroup.style.display = 'block';
+                if (deviceToken && lastTrustedUser && u === lastTrustedUser) {
+                    passwordGroup.style.display = 'block';
+                    phoneGroup.style.display = 'none';
+                    smsGroup.style.display = 'none';
+                } else {
+                    passwordGroup.style.display = 'block';
+                    phoneGroup.style.display = 'block';
+                    smsGroup.style.display = 'flex';
+                }
             }
         } else {
+            // 注册和找回密码模式
+            loginModeSwitch.style.display = 'none';
             rememberGroup.style.display = 'none';
+            usernameGroup.style.display = 'block';
+            passwordGroup.style.display = 'block';
             phoneGroup.style.display = 'block';
             smsGroup.style.display = 'flex';
         }
@@ -24,12 +52,12 @@
         if (currentTab !== 'register') return;
         const u = document.getElementById('username').value;
         if (!u) return;
-        
-        const usernameRegex = /^[a-zA-Z0-9\u4e00-\u9fa5]{1,7}$/;
+
+        const usernameRegex = /^[a-zA-Z0-9一-龥]{1,7}$/;
         if (!usernameRegex.test(u)) {
             return showAlert('error', '用户名称最多只能是7个字符（支持中文、英文、数字）');
         }
-        
+
         try {
             const res = await fetch(host + '/api/check_username', {
                 method: 'POST',
@@ -52,11 +80,11 @@
             document.getElementById('password').value = savedPwd;
             document.getElementById('remember-pwd').checked = true;
         }
-        
+
         document.getElementById('username').addEventListener('input', updateLoginUI);
         document.getElementById('username').addEventListener('blur', checkUsername);
         updateLoginUI();
-        
+
         checkNotification();
         startHeartbeat();
         startRemoteStatusPolling();
@@ -85,7 +113,7 @@
     function startHeartbeat() {
         setInterval(async () => {
             const banner = document.getElementById('connection-error-banner');
-            
+
             if (!currentToken) return;
 
             try {
@@ -93,7 +121,7 @@
                     headers: { 'Authorization': 'Bearer ' + currentToken },
                     signal: AbortSignal.timeout(3000)
                 });
-                
+
                 if (res.ok) {
                     const data = await res.json();
                     if (data.code === 200) {
@@ -104,6 +132,9 @@
                             currentCanUseCloud = data.canUseCloud;
                             var authBtn = document.getElementById('btn-auth-phones');
                             if (authBtn) authBtn.style.display = currentCanUseCloud ? 'flex' : 'none';
+                        }
+                        if (data.phone !== undefined) {
+                            currentPhone = data.phone;
                         }
 
                         // xCrab 模式 + 已授权用户不需要 cclaw 连接
@@ -154,7 +185,7 @@
 
         if (heartbeatFailures >= MAX_HEARTBEAT_FAILURES) {
             banner.style.display = 'block';
-            
+
             if (document.getElementById('stop-btn').style.display === 'flex') {
                 resetSendBtn();
                 const sessionState = getSessionState(currentSessionId);
@@ -167,7 +198,7 @@
                     sessionState.msgId = null;
                 }
             }
-            
+
             setTimeout(async () => {
                 try {
                     const res = await fetch(host + '/api/client_status?t=' + Date.now(), {
@@ -299,12 +330,12 @@
         document.getElementById('tab-login').className = tab === 'login' ? 'tab active' : 'tab';
         document.getElementById('tab-register').className = tab === 'register' ? 'tab active' : 'tab';
         document.getElementById('tab-reset').className = tab === 'reset' ? 'tab active' : 'tab';
-        
+
         let btnText = '连 接';
         if (tab === 'register') btnText = '注 册';
         if (tab === 'reset') btnText = '重 置 密 码';
         document.getElementById('btn-submit').innerText = btnText;
-        
+
         if (tab === 'reset') {
             document.getElementById('password').placeholder = '新密码';
         } else {
@@ -330,14 +361,17 @@
     }
 
     async function sendSms() {
-        const u = document.getElementById('username').value;
-        if (!u) return showAlert('error', '请输入账号');
-        const usernameRegex = /^[a-zA-Z0-9\u4e00-\u9fa5]{1,7}$/;
-        if (!usernameRegex.test(u)) {
-            return showAlert('error', '用户名称最多只能是7个字符（支持中文、英文、数字）');
-        }
+        const phone = document.getElementById('phone').value;
+        if (!phone) return showAlert('error', '请输入手机号');
 
-        if (currentTab === 'login' || currentTab === 'reset') {
+        // 如果是密码登录模式，需要先输入账号来校验
+        if (currentTab === 'login' && loginMode === 'password') {
+            const u = document.getElementById('username').value;
+            if (!u) return showAlert('error', '请输入账号');
+            const usernameRegex = /^[a-zA-Z0-9一-龥]{1,7}$/;
+            if (!usernameRegex.test(u)) {
+                return showAlert('error', '用户名称最多只能是7个字符（支持中文、英文、数字）');
+            }
             try {
                 const resCheck = await fetch(host + '/api/check_username', {
                     method: 'POST',
@@ -354,13 +388,36 @@
             }
         }
 
-        const phone = document.getElementById('phone').value;
-        if (!phone) return showAlert('error', '请输入手机号');
-        
+        // 注册和找回密码模式需要校验账号
+        if (currentTab === 'register' || currentTab === 'reset') {
+            const u = document.getElementById('username').value;
+            if (!u) return showAlert('error', '请输入账号');
+            const usernameRegex = /^[a-zA-Z0-9一-龥]{1,7}$/;
+            if (!usernameRegex.test(u)) {
+                return showAlert('error', '用户名称最多只能是7个字符（支持中文、英文、数字）');
+            }
+            if (currentTab === 'reset') {
+                try {
+                    const resCheck = await fetch(host + '/api/check_username', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: u }),
+                        signal: AbortSignal.timeout(10000)
+                    });
+                    const dataCheck = await resCheck.json();
+                    if (dataCheck.code === 200 && !dataCheck.exist) {
+                        return showAlert('error', '该账号未注册，请注册');
+                    }
+                } catch (e) {
+                    return showAlert('error', '网络错误，无法校验账号');
+                }
+            }
+        }
+
         const btn = document.getElementById('btn-send-sms');
         btn.disabled = true;
         let count = 60;
-        
+
         try {
             const res = await fetch(host + '/api/send_sms', {
                 method: 'POST',
@@ -397,34 +454,49 @@
         const phone = document.getElementById('phone').value;
         const code = document.getElementById('sms_code').value;
         const remember = document.getElementById('remember-pwd').checked;
-        
-        if (!u || !p) return showAlert('error', '请填写账号和密码');
-        
-        const usernameRegex = /^[a-zA-Z0-9\u4e00-\u9fa5]{1,7}$/;
-        if (!usernameRegex.test(u)) {
-            return showAlert('error', '用户名称最多只能是7个字符（支持中文、英文、数字）');
-        }
-        
+
         const isLogin = currentTab === 'login';
         const isReset = currentTab === 'reset';
-        const requiresSms = document.getElementById('phone-group').style.display !== 'none';
-        
-        if (requiresSms && (!phone || !code)) {
-            return showAlert('error', '请填写完整信息(含验证码)');
+        const isRegister = currentTab === 'register';
+
+        // 验证码登录模式（仅登录时）
+        if (isLogin && loginMode === 'sms') {
+            if (!phone) return showAlert('error', '请输入手机号');
+            if (!code) return showAlert('error', '请输入验证码');
+        } else {
+            // 密码登录、注册、找回密码模式
+            if (!u) return showAlert('error', '请输入账号');
+            if (!isReset && !p) return showAlert('error', '请输入密码');
+
+            const usernameRegex = /^[a-zA-Z0-9一-龥]{1,7}$/;
+            if (!usernameRegex.test(u)) {
+                return showAlert('error', '用户名称最多只能是7个字符（支持中文、英文、数字）');
+            }
+
+            const requiresSms = document.getElementById('phone-group').style.display !== 'none';
+            if (requiresSms && (!phone || !code)) {
+                return showAlert('error', '请填写完整信息(含验证码)');
+            }
         }
-        
+
         let endpoint = isLogin ? '/api/login' : '/api/register';
         if (isReset) endpoint = '/api/reset_password';
-        
+
         const btn = document.getElementById('btn-submit');
         btn.disabled = true;
         btn.innerText = '处理中...';
 
-        let payload = { username: u, password: p, phone, sms_code: code };
-        if (isReset) {
+        let payload;
+        if (isLogin && loginMode === 'sms') {
+            // 仅验证码登录
+            payload = { phone, sms_code: code, login_mode: 'sms' };
+        } else if (isReset) {
             payload = { username: u, new_password: p, phone, sms_code: code };
-        } else if (isLogin && !requiresSms && deviceToken) {
-            payload.device_token = deviceToken;
+        } else {
+            payload = { username: u, password: p, phone, sms_code: code };
+            if (isLogin && document.getElementById('phone-group').style.display === 'none' && deviceToken) {
+                payload.device_token = deviceToken;
+            }
         }
 
         try {
@@ -435,14 +507,14 @@
                 signal: AbortSignal.timeout(15000)
             });
             const data = await res.json();
-            
+
             if (data.code === 200) {
                 if (isReset) {
                     showAlert('success', '密码重置成功，请登录');
                     switchTab('login');
                     document.getElementById('password').value = '';
                     document.getElementById('sms_code').value = '';
-                } else if (!isLogin) {
+                } else if (isRegister) {
                     showAlert('success', '注册成功，请登录');
                     switchTab('login');
                     document.getElementById('sms_code').value = '';
@@ -450,17 +522,18 @@
                     currentToken = data.data.token;
                     currentUser = data.data.username;
                     currentCanUseCloud = data.data.canUseCloud === true;
+                    currentPhone = data.data.phone || null;
                     if (data.data.device_token) {
                         deviceToken = data.data.device_token;
                         localStorage.setItem('wclaw_device_token', deviceToken);
-                        lastTrustedUser = u;
+                        lastTrustedUser = u || phone;
                         localStorage.setItem('wclaw_last_trusted_user', lastTrustedUser);
                     }
                     localStorage.setItem('wclaw_token', currentToken);
                     localStorage.setItem('wclaw_user', currentUser);
                     syncTTSSettingsFromServer();
-                    
-                    if (remember) {
+
+                    if (remember && u && p) {
                         localStorage.setItem('wclaw_saved_user', u);
                         localStorage.setItem('wclaw_saved_pwd', p);
                         savedUser = u;
@@ -471,12 +544,14 @@
                         savedUser = null;
                         savedPwd = null;
                     }
-                    
+
                     showApp();
                     if (typeof connectNotificationSSE === 'function') connectNotificationSSE();
                     if (typeof updateHeaderBackend === 'function') updateHeaderBackend();
-
                 }
+            } else if (data.code === 409 && data.data && data.data.need_select) {
+                // 多账号选择
+                showAccountSelector(data.data.accounts, phone, code);
             } else {
                 if (data.message && data.message.includes('新设备登录')) {
                     document.getElementById('phone-group').style.display = 'block';
@@ -505,6 +580,80 @@
         // 显示授权按钮（仅 ad1009 可见）
         var authBtn = document.getElementById('btn-auth-phones');
         if (authBtn) authBtn.style.display = currentCanUseCloud ? 'flex' : 'none';
+    }
+
+    // ========== 多账号选择 ==========
+    var pendingAccounts = [];
+    var pendingPhone = '';
+    var pendingSmsCode = '';
+
+    function showAccountSelector(accounts, phone, smsCode) {
+        pendingAccounts = accounts;
+        pendingPhone = phone;
+        pendingSmsCode = smsCode;
+
+        var listHtml = accounts.map(function(acc) {
+            return '<div class="account-option" onclick="selectAccount(\'' + acc + '\')" style="display:flex;align-items:center;padding:14px 16px;margin:6px 0;background:var(--input-bg);border:2px solid var(--border-light);border-radius:var(--radius-md);cursor:pointer;transition:all 0.2s;">'
+                + '<i class="fa-solid fa-user" style="color:var(--primary);margin-right:12px;font-size:18px;"></i>'
+                + '<span style="font-size:16px;font-weight:500;color:var(--text-main);">' + acc + '</span>'
+                + '</div>';
+        }).join('');
+
+        document.getElementById('account-list').innerHTML = listHtml;
+        document.getElementById('account-select-modal').style.display = 'flex';
+    }
+
+    function selectAccount(username) {
+        document.getElementById('account-select-modal').style.display = 'none';
+        confirmAccountLogin(username, pendingPhone, pendingSmsCode);
+    }
+
+    async function confirmAccountLogin(username, phone, smsCode) {
+        var btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+        btn.innerText = '处理中...';
+
+        try {
+            var res = await fetch(host + '/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phone: phone,
+                    sms_code: smsCode,
+                    login_mode: 'sms',
+                    username: username
+                }),
+                signal: AbortSignal.timeout(15000)
+            });
+            var data = await res.json();
+
+            if (data.code === 200) {
+                currentToken = data.data.token;
+                currentUser = data.data.username;
+                currentCanUseCloud = data.data.canUseCloud === true;
+                currentPhone = data.data.phone || null;
+                if (data.data.device_token) {
+                    deviceToken = data.data.device_token;
+                    localStorage.setItem('wclaw_device_token', deviceToken);
+                    lastTrustedUser = username;
+                    localStorage.setItem('wclaw_last_trusted_user', lastTrustedUser);
+                }
+                localStorage.setItem('wclaw_token', currentToken);
+                localStorage.setItem('wclaw_user', currentUser);
+                syncTTSSettingsFromServer();
+
+                showApp();
+                if (typeof connectNotificationSSE === 'function') connectNotificationSSE();
+                if (typeof updateHeaderBackend === 'function') updateHeaderBackend();
+            } else {
+                showAlert('error', data.message || '登录失败');
+            }
+        } catch (e) {
+            showAlert('error', '网络错误，请稍后再试');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = '连 接';
+        }
     }
 
     // ========== 授权管理 ==========

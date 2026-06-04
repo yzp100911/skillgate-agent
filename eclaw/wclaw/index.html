@@ -39,7 +39,7 @@
         <div style="font-size: 48px; color: #FF9500; margin-bottom: 12px;"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <h3 style="color: #FF9500; font-size: 22px; margin-bottom: 8px;">连接警告</h3>
         <div id="cclaw-warning-content" style="margin-bottom: 20px; line-height: 1.7; white-space: pre-wrap;">
-            <p style="margin: 4px 0;">本地执行端 (xCrab) 未连接，请联系开发者（微信：cp520991317）授权</p>
+            <p style="margin: 4px 0;">您的本地执行端 (xCrab)未连接，请联系开发者（微信：cp520991317）授权</p>
             <p style="color: var(--text-muted); font-size: 14px; margin: 4px 0;">授权后刷新页面即可正常使用</p>
         </div>
         <div class="modal-actions" style="justify-content: center;">
@@ -123,7 +123,7 @@
         <h3 style="font-size: 20px; margin-bottom: 4px;">切换大模型</h3>
         <p style="color: var(--text-sub); font-size: 14px; margin: 0 0 20px 0;">选择要切换的主力模型</p>
         <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
-            <button class="btn-confirm" onclick="executeSwitchModel('deepseek')" style="padding: 14px; font-size: 15px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <button id="btn-model-deepseek" class="btn-confirm" onclick="executeSwitchModel('deepseek')" style="padding: 14px; font-size: 15px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; gap: 8px;">
                 <span style="font-weight: 600;">deepseek-v4-flash[1M]</span>
                 <span style="font-size: 12px; opacity: 0.7;">DeepSeek</span>
             </button>
@@ -131,7 +131,7 @@
                 <span style="font-weight: 600;">MiniMax-M2.7</span>
                 <span style="font-size: 12px; opacity: 0.7;">MiniMax</span>
             </button>
-            <button class="btn-confirm" onclick="executeSwitchModel('mimo')" style="padding: 14px; font-size: 15px; border-radius: var(--radius-md); background: #F59E0B; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <button id="btn-model-mimo" class="btn-confirm" onclick="executeSwitchModel('mimo')" style="padding: 14px; font-size: 15px; border-radius: var(--radius-md); background: #F59E0B; display: flex; align-items: center; justify-content: center; gap: 8px;">
                 <span style="font-weight: 600;">mimo-v2.5-pro[1M]</span>
                 <span style="font-size: 12px; opacity: 0.7;">Mimo · 1M</span>
             </button>
@@ -156,6 +156,23 @@
         </div>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="document.getElementById('auth-phones-modal').style.display='none'">关 闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 账号选择弹窗 -->
+<div id="account-select-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 400px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+            <div style="font-size: 28px; color: var(--primary);"><i class="fa-solid fa-users"></i></div>
+            <h3 style="margin: 0; font-size: 20px;">选择账号</h3>
+        </div>
+        <p style="color: var(--text-sub); font-size: 14px; margin-bottom: 16px;">该手机号绑定了多个账号，请选择要登录的账号：</p>
+        <div id="account-list" style="max-height: 50vh; overflow-y: auto;">
+            <!-- 账号列表渲染区 -->
+        </div>
+        <div class="modal-actions" style="margin-top: 16px;">
+            <button class="btn-cancel" onclick="document.getElementById('account-select-modal').style.display='none'">取 消</button>
         </div>
     </div>
 </div>
@@ -193,11 +210,21 @@
             <div class="tab" id="tab-reset" onclick="switchTab('reset')">找回密码</div>
         </div>
 
-        <div class="form-group">
+        <!-- 登录方式切换（仅登录tab显示） -->
+        <div class="login-mode-switch" id="login-mode-switch">
+            <button class="login-mode-btn active" id="mode-password" onclick="switchLoginMode('password')">
+                <i class="fa-solid fa-key"></i> 密码登录
+            </button>
+            <button class="login-mode-btn" id="mode-sms" onclick="switchLoginMode('sms')">
+                <i class="fa-solid fa-mobile-screen"></i> 验证码登录
+            </button>
+        </div>
+
+        <div class="form-group" id="username-group">
             <input type="text" id="username" placeholder="账号">
             <div id="username-hint" style="display: none; font-size: 12px; color: var(--text-sub); margin-top: 6px; padding-left: 4px;">最多7个字符（仅支持中文、英文、数字）</div>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="password-group">
             <input type="password" id="password" placeholder="密码">
         </div>
         <div class="form-group" id="phone-group">
@@ -228,17 +255,14 @@
             <h3 style="margin: 0; font-size: 22px; color: var(--text-main);">使用说明</h3>
         </div>
         <div style="margin-bottom: 20px; line-height: 1.8; font-size: 15px; color: var(--text-sub); word-break: break-all; max-height: 55vh; overflow-y: auto; padding-right: 6px; padding-left: 2px;">
-            <p style="margin: 0 0 12px 0;"><strong style="color: var(--text-main);">第一步：</strong>下载压缩包</p>
-            <p style="margin: 0 0 12px 16px;">
-                <a href="https://119.29.196.58:11281/down/i12T0aVzZs6w.rar" target="_blank" style="color: var(--primary); word-break: break-all;">https://119.29.196.58:11281/down/ALVVnRjOfzQw.rar</a>
-            </p>
-            <p style="margin: 0 0 12px 0;"><strong style="color: var(--text-main);">第二步：</strong>解压到任意文件夹，打开 openclaw-setup，找到 ddclaw.exe 并双击打开</p>
-            <p style="margin: 0 0 12px 16px;">系统会提示配置 API Key，请先在各大模型厂商获取 API Key 并填入。</p>
-            <p style="margin: 0 0 12px 0;"><strong style="color: var(--text-main);">手动配置：</strong><code style="background: var(--input-bg); padding: 2px 8px; border-radius: 4px; font-size: 13px;">data\openclaw.json</code></p>
-            <p style="margin: 0 0 12px 0;"><strong style="color: var(--text-main);">第三步：</strong>配置完成后，重启 ddclaw.exe，等待 5 秒后即可登录</p>
-            <p style="margin: 0 0 12px 0;"><strong style="color: var(--text-main);">第四步：</strong>返回网页端 <a href="http://www.xunrf.cn:10090/" target="_blank" style="color: var(--primary);">http://www.xunrf.cn:10090/</a> 登录，即可通过网页发送指令</p>
+        
+           
+            <p style="margin: 0 0 12px 16px;">完整部署文档还有源代码都在这里：<a href="https://github.com/yzp100911/skillgate-agent" target="_blank" style="color: var(--primary); word-break: break-all;">https://github.com/yzp100911/skillgate-agent</a>
+            
+（注意：由于在国内直接访问github.com是很难访问得了的，因为国内是无法访问国外网站的，所以要通过科学方法才行。实在不知道怎么弄，可以直接微信找我，我的微信号：cp520991317）</p>
+            
             <hr style="border: none; border-top: 1px solid var(--border-light); margin: 16px 0;">
-            <p style="margin: 0; font-size: 14px;">详细视频教程请关注抖音号：<strong style="color: var(--primary);">44018485339</strong></p>
+            
         </div>
         <div class="modal-actions" style="justify-content: center;">
             <button class="btn-confirm" style="width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md);" onclick="document.getElementById('instruction-modal').style.display='none'">我 已 了 解 ， 关 闭 弹 窗</button>
@@ -312,7 +336,7 @@
                 <button class="btn-icon btn-icon-blue" onclick="document.getElementById('feedback-modal').style.display='flex'" title="意见反馈">
                     <i class="fa-solid fa-comment-dots"></i><span class="btn-text"> 反馈</span>
                 </button>
-                <button class="btn-icon btn-icon-blue" onclick="document.getElementById('switch-model-modal').style.display='flex'" title="切换大模型">
+                <button class="btn-icon btn-icon-blue" onclick="updateModelButtons();document.getElementById('switch-model-modal').style.display='flex'" title="切换大模型">
                     <i class="fa-solid fa-arrows-rotate"></i><span class="btn-text btn-text-grid"><span>切换</span><span>模型</span></span>
                 </button>
                 <button class="btn-icon btn-icon-blue" id="btn-auth-phones" onclick="openAuthPhonesModal()" title="授权管理" style="display: none;">
